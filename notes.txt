@@ -1,0 +1,25 @@
+// clag = chunklag, localize lag to the chunks causing it by slowing down time inside laggy chunks.
+* reflection docs : http://docs.oracle.com/javase/tutorial/reflect/index.html
+
+== tileentity sleep
+public void TileEntity.updateEntity() {}
+public void World.updateEntities()
+		
+
+== snippet : access to privat fields
+    	WorldRenderer[] worldRenderers = null;
+    	try {
+	        Field field1 = rg.getClass().getDeclaredField("worldRenderers");
+	        field1.setAccessible(true);
+	        worldRenderers = (WorldRenderer[])field1.get(rg);
+    	} catch (Exception e)
+    	{
+    		FMLLog.info("GShipRender.MyGetWorldRenderer setAccessible fail");
+    	}
+
+=== gradle setup :
+command prompt : 
+* gradlew.bat build
+* gradlew.bat setupDevWorkspace
+* gradlew.bat eclipse
+HOWTO: Getting Started with ForgeGradle : http://www.minecraftforge.net/forum/index.php?topic=14048.0
