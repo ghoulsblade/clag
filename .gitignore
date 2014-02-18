@@ -5,3 +5,16 @@
 /forge164lag/mcp/src/minecraft/assets/forge/lang/fr_FR.lang
 /forge164lag/mcp/src/minecraft/deobfuscation_data-1.6.4.lzma
 /forge164lag/mcp/src/minecraft/forge_at.cfg~
+/build
+/.idea
+/.gradle
+/classes
+/eclipse
+/saves
+/*.log
+/*.lck
+/config
+/stats
+/mymod4.iml
+/mymod4.ipr
+/mymod4.iws
