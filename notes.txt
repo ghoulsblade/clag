@@ -23,3 +23,13 @@ command prompt :
 * gradlew.bat setupDevWorkspace
 * gradlew.bat eclipse
 HOWTO: Getting Started with ForgeGradle : http://www.minecraftforge.net/forum/index.php?topic=14048.0
+
+* deploy : gradew.bat build
+** C:\game\minecraft\mymod4\build\libs CLagID-1.0.jar
+** build.gradle version = "0.0.1"
+
+* show all options : gradlew.bat tasks
+
+== general nots
+* minecraft server wrapper (replacement for linux screen) : https://github.com/mcdevs/mark2
+* code/assembly injection http://www.minecraftforum.net/topic/1854988-tutorial-162-changing-vanilla-without-editing-base-classes-coremods-and-events-very-advanced/
