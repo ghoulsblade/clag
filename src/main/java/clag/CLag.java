@@ -11,6 +11,8 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityEvent;
 
 @Mod(modid=CLagInfo.ID, name=CLagInfo.NAME, version=CLagInfo.VERS)
 // @NetworkMod(clientSideRequired=false, serverSideRequired=true)
@@ -59,9 +61,12 @@ public class CLag {
         @EventHandler // used in 1.6.2
         //@Init       // used in 1.5.2
         public void load(FMLInitializationEvent event) {
-                FMLLog.info("CLag: load 01");
-                proxy.registerTickHandler();
-                FMLLog.info("CLag: load 11");
+            FMLLog.info("CLag: load 01");
+            proxy.registerTickHandler();
+            FMLLog.info("CLag: load 2");
+
+            MinecraftForge.EVENT_BUS.register(this);
+            FMLLog.info("CLag: load 3");
         }
        
         @EventHandler // used in 1.6.2
@@ -69,6 +74,14 @@ public class CLag {
         public void postInit(FMLPostInitializationEvent event) {
                 // Stub Method
         }
-        
+
+        /*
+        @EventHandler // used in 1.6.2
+        // @ForgeSubscribe
+        public void onEntityCanUpdate(EntityEvent.CanUpdate event) {
+            // TODO: check if in sleeping chunk and disable
+            // event.canUpdate = false;
+        }
+        */
 
 }

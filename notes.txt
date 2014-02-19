@@ -6,6 +6,23 @@ public void TileEntity.updateEntity() {}
 public void World.updateEntities()
 		
 
+=== profile chunk time (tileentities + rest)
+
+NOTE: interesting! https://github.com/nallar/TickProfiler   
+main class : https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/TickProfiler.java
+public synchronized void hookProfiler(World world) {  overrides  loadedTileEntityField
+https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/entitylist/EntityList.java
+
+TickThreading: The profiler mod is from tickthreading but without the extra features added.
+https://github.com/nallar/TickThreading/tree/master/src/common/nallar/patched is where the patched MC files are
+
+=== tile entities	
+
+World : this.loadedTileEntityList
+idea: a tick handler that only executes like every 10 ticks.  when it executes it accesses this list, removes all tile-entities in it that are in "slowed" chunks, and stores them it's own reactivation list (weak ref).  10 ticks later it re adds them if they're still "alive" so time doesn't stand completely still.
+that'd slow down time in laggy chunks by half.   for very laggy chunks we could setup a 2nd list to re-add them like 20 or 40 ticks later
+
+
 == snippet : access to privat fields
     	WorldRenderer[] worldRenderers = null;
     	try {
@@ -17,6 +34,21 @@ public void World.updateEntities()
     		FMLLog.info("GShipRender.MyGetWorldRenderer setAccessible fail");
     	}
 
+=== forge event
+	see http://www.minecraftforum.net/topic/1854988-tutorial-162-changing-vanilla-without-editing-base-classes-coremods-and-events-very-advanced/
+
+	World.updateEntityWithOptionalForce
+        if (!canUpdate)
+        {
+            EntityEvent.CanUpdate event = new EntityEvent.CanUpdate(par1Entity);
+            MinecraftForge.EVENT_BUS.post(event);
+            canUpdate = event.canUpdate;
+        }
+        if (canUpdate)
+        {
+		..
+		}
+		
 === gradle setup :
 command prompt : 
 * gradlew.bat build
@@ -33,3 +65,4 @@ HOWTO: Getting Started with ForgeGradle : http://www.minecraftforge.net/forum/in
 == general nots
 * minecraft server wrapper (replacement for linux screen) : https://github.com/mcdevs/mark2
 * code/assembly injection http://www.minecraftforum.net/topic/1854988-tutorial-162-changing-vanilla-without-editing-base-classes-coremods-and-events-very-advanced/
+* tick-threading : https://github.com/nallar/TickThreading

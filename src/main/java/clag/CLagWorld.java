@@ -1,3 +1,5 @@
+// probably not needed
+
 package clag;
 
 import cpw.mods.fml.common.FMLLog;
@@ -19,10 +21,12 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 
+
 /**
  * Created by ghoul on 18.02.14.
  */
-public class CLagWorld extends WorldServer {
+public class CLagWorld { //extends WorldServer
+/*
     WorldServer _world;
     public CLagWorld (WorldServer w,
                        MinecraftServer par1MinecraftServer,
@@ -45,11 +49,12 @@ public class CLagWorld extends WorldServer {
 
         _world = w;
     }
-
+*/
 
     /**
      * Updates (and cleans up) entities and tile entities
      */
+/*
     @Override
     public void updateEntities()
     {
@@ -312,5 +317,5 @@ public class CLagWorld extends WorldServer {
         this.theProfiler.endSection();
         this.theProfiler.endSection();
     }
-
+*/
 }
