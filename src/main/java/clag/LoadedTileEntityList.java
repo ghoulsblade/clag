@@ -13,6 +13,8 @@ public class LoadedTileEntityList extends EntityList<TileEntity> {
 
     @Override
     public void tick() {
+        // see https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
         //EntityTickProfiler.ENTITY_TICK_PROFILER.runTileEntities(world, innerList);
+        CLagTileEntityTicker.instance.runTileEntities(world, innerList);
     }
 }

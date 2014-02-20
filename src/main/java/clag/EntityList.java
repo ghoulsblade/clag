@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 import java.lang.reflect.*;
 import java.util.*;
 
-// based on https://github.com/nallar/TickProfiler/edit/master/src/common/me/nallar/tickprofiler/minecraft/entitylist/EntityList.java
+// based on https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/entitylist/EntityList.java
 
 
 /*
@@ -51,6 +51,8 @@ public abstract class EntityList<T> extends ArrayList<T> {
         // Broken on newer JDKs, automatically falls back to security manager implementation when this doesn't work.
         //noinspection deprecation
         return sun.reflect.Reflection.getCallerClass(depth + 2);
+
+        // TODO: check if this might be broken, then we need the ContextAccessSecurityManager thing from nallar/TickProfiler
 
         //  extends SecurityManager
         // return getClassContext()[depth + 1];

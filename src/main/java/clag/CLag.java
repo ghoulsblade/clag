@@ -144,6 +144,7 @@ public class CLag {
             FMLLog.severe("CLag: World " + (world.getClass()) + " seems to be a client world", new Throwable());
         }
         try {
+            // overrides World.loadedTileEntityList
             Field loadedTileEntityField = CLagUtils.getFields(World.class, List.class)[loadedTileEntityFieldIndex];
             Object loadedTileEntityList = loadedTileEntityField.get(world);
             if (loadedTileEntityList instanceof EntityList) {

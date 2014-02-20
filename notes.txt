@@ -23,6 +23,21 @@ idea: a tick handler that only executes like every 10 ticks.  when it executes i
 that'd slow down time in laggy chunks by half.   for very laggy chunks we could setup a 2nd list to re-add them like 20 or 40 ticks later
 
 
+== interesting : MCPC+ active chunk hook ? 
+
+https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
+private Method getIsActiveChunkMethod() {
+	Class<World> clazz = World.class;
+	try {
+		Method method = clazz.getDeclaredMethod("isActiveChunk", int.class, int.class);
+		Log.info("Found MCPC+ isActiveChunk method " + method);
+		return method;
+	} catch (NoSuchMethodException e) {
+		Log.info("Did not find MCPC+ isActiveChunk method, assuming vanilla entity ticking.");
+	}
+	return null;
+}
+
 == snippet : access to privat fields
     	WorldRenderer[] worldRenderers = null;
     	try {
