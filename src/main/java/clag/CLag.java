@@ -40,9 +40,7 @@ public class CLag {
         	ServerCommandManager scm = (ServerCommandManager)event.getServer().getCommandManager();
         	FMLLog.info("CLag: adding commands...");
         	FMLLog.info("CLag: serverStarting 02");
-			/*
-        	scm.registerCommand(new CLagCommandTest());
-			*/
+        	scm.registerCommand(new CLagCommand());
 
         	FMLLog.info("CLag: serverStarting 03");
         }
@@ -99,23 +97,50 @@ public class CLag {
     private static final int loadedEntityFieldIndex = 0;
     private static final int loadedTileEntityFieldIndex = 2;
 
+    /*
     public boolean startProfilingOverworld() {
         World[] arr = new World[1];
         arr[0] = CLagUtils.GetOverworld();
         return startProfiling(Arrays.<World>asList(arr));
     }
+    */
+    boolean bIsCLagRunning = false;
 
-    public boolean startProfiling() {
+    public boolean startCLag() {
+        if (bIsCLagRunning) return false;
+        bIsCLagRunning = true;
         final Collection<World> worlds_ = Arrays.<World>asList(DimensionManager.getWorlds());
-        return startProfiling(worlds_);
+        return startCLag(worlds_);
     }
 
+    public boolean stopCLag() {
+        if (!bIsCLagRunning) return false;
+        bIsCLagRunning = false;
+        final Collection<World> worlds_ = Arrays.<World>asList(DimensionManager.getWorlds());
+        return stopCLag(worlds_);
+    }
+
+    // -------------- internal, do not call directly
+
     // based on https://github.com/nallar/TickProfiler/blob/0449ed2bf76884bcf18847562f8235f3a2e44e9b/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
-    public boolean startProfiling(final Collection<World> worlds_) {
+    public boolean startCLag(final Collection<World> worlds_) {
         final Collection<World> worlds = new ArrayList<World>(worlds_);
         synchronized (CLag.class) {
             for (World world_ : worlds) {
-                CLag.instance.hookProfiler(world_);
+                CLag.instance.installHook(world_);
+            }
+        }
+        return true;
+    }
+
+
+
+    // based on https://github.com/nallar/TickProfiler/blob/0449ed2bf76884bcf18847562f8235f3a2e44e9b/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
+    public boolean stopCLag(final Collection<World> worlds_) {
+        final Collection<World> worlds = new ArrayList<World>(worlds_);
+        synchronized (CLag.class) {
+            for (World world_ : worlds) {
+                CLag.instance.uninstallHook(world_);
             }
         }
         return true;
@@ -123,7 +148,7 @@ public class CLag {
 
 
     // based on https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/TickProfiler.java
-    public synchronized void hookProfiler(World world) {
+    public synchronized void installHook(World world) {
         if (world.isRemote) {
             FMLLog.severe("CLag: World " + (world.getClass()) + " seems to be a client world", new Throwable());
         }
@@ -139,7 +164,7 @@ public class CLag {
     }
 
     // based on https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/TickProfiler.java
-    public synchronized void unhookProfiler(World world) {
+    public synchronized void uninstallHook(World world) {
         if (world.isRemote) {
             FMLLog.severe("CLag: World " + (world.getClass()) + " seems to be a client world", new Throwable());
         }
