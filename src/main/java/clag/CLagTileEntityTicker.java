@@ -21,14 +21,15 @@ import java.util.Map;
 public class CLagTileEntityTicker {
     public static CLagTileEntityTicker instance = new CLagTileEntityTicker();
     boolean bIsProfiling = false;
-    public final int PROFILE_INTERVAL = 30*20; // every 30 seconds
+    public final int PROFILE_INTERVAL = 10*20; // every x*20 seconds
     public int cur_ticknum = 0;
 
     public final long TIMESUM_MICRO = 1000*1; // System.nanoTime -> nano*1000 = micro, micro*1000 = milli
     public final long TIMESUM_MILLI = 1000*TIMESUM_MICRO;
     public final long TIMESUM_SECOND = 1000*TIMESUM_MILLI;
     public final long TIMESUM_TICK = TIMESUM_SECOND/20;
-    public long timesum_min_slow = TIMESUM_TICK/100;
+    public long timesum_min_slow = TIMESUM_TICK/20;
+    // public long timesum_min_slow = 10;
 
     public int slow_down_factor = 20;
 
@@ -40,9 +41,14 @@ public class CLagTileEntityTicker {
     public void StartTick (int iTickNum) {
         cur_ticknum = iTickNum;
         bIsProfiling = (iTickNum % PROFILE_INTERVAL) == 0;
+        if (bIsProfiling) FMLLog.info("CLagTileEntityTicker:StartTick profile "+iTickNum);
+
         lastchunk_dim = Integer.MAX_VALUE; // make sure cur_ticknum check (sum reset) is done for last used chunk as well
-        worst_chunk_time = 0;
+        if (bIsProfiling) worst_chunk_time = 0;
         ChunkSkipStartTick();
+    }
+    public void EndTick (int iTickNum) {
+        if (bIsProfiling) FMLLog.info("CLagTileEntityTicker:EndTick profile "+iTickNum+",worst_chunk_time="+worst_chunk_time);
     }
 
     public void runTileEntities(World world, ArrayList<TileEntity> toTick) {
@@ -215,11 +221,11 @@ public class CLagTileEntityTicker {
             {
                 lastchunkinfo.ticknum = cur_ticknum;
                 lastchunkinfo.iTimeSum = 0;
-                //lastchunkinfo.worst_time = 0;
+                lastchunkinfo.worst_time = 0;
             }
         }
         lastchunkinfo.iTimeSum += dt;
-        /*
+
         // collect worst tileentity to inform nearby players and help them fix the issue
         if (dt > lastchunkinfo.worst_time)
         {
@@ -228,6 +234,5 @@ public class CLagTileEntityTicker {
             lastchunkinfo.worst_y = y;
             lastchunkinfo.worst_z = z;
         }
-        */
     }
 }

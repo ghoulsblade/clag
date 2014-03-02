@@ -40,9 +40,13 @@ public class CLag {
         	ServerCommandManager scm = (ServerCommandManager)event.getServer().getCommandManager();
         	FMLLog.info("CLag: adding commands...");
         	FMLLog.info("CLag: serverStarting 02");
-        	scm.registerCommand(new CLagCommand());
-
+            scm.registerCommand(new CLagCommand());
+            scm.registerCommand(new CLagCommandInfo());
         	FMLLog.info("CLag: serverStarting 03");
+
+            // autostart
+            FMLLog.info("CLag: autostarting profiling+slowing...");
+            startCLag();
         }
         
         @EventHandler // used in 1.6.2
@@ -124,6 +128,7 @@ public class CLag {
 
     // based on https://github.com/nallar/TickProfiler/blob/0449ed2bf76884bcf18847562f8235f3a2e44e9b/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
     public boolean startCLag(final Collection<World> worlds_) {
+        FMLLog.info("CLag: startCLag for #worlds= " + worlds_.size());
         final Collection<World> worlds = new ArrayList<World>(worlds_);
         synchronized (CLag.class) {
             for (World world_ : worlds) {
@@ -137,6 +142,7 @@ public class CLag {
 
     // based on https://github.com/nallar/TickProfiler/blob/0449ed2bf76884bcf18847562f8235f3a2e44e9b/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
     public boolean stopCLag(final Collection<World> worlds_) {
+        FMLLog.info("CLag: stopCLag for #worlds= " + worlds_.size());
         final Collection<World> worlds = new ArrayList<World>(worlds_);
         synchronized (CLag.class) {
             for (World world_ : worlds) {
@@ -157,7 +163,7 @@ public class CLag {
             new LoadedTileEntityList(world, loadedTileEntityField);
             //Field loadedEntityField = CLagUtils.getFields(World.class, List.class)[loadedEntityFieldIndex];
             //new LoadedEntityList(world, loadedEntityField);
-            FMLLog.finer("CLag: Profiling hooked for world " + (world.getClass()));
+            FMLLog.info("CLag: Profiling hooked for world " + (world.getClass()));
         } catch (Exception e) {
             FMLLog.severe("CLag: Failed to initialise profiling for world " + (world.getClass()), e);
         }
@@ -185,7 +191,7 @@ public class CLag {
             } else {
                 FMLLog.severe("CLag: Looks like another mod broke TickProfiler's replacement entity list in world: " + (world.getClass()));
             }*/
-            FMLLog.finer("CLag: Profiling unhooked for world " + (world.getClass()));
+            FMLLog.info("CLag: Profiling unhooked for world " + (world.getClass()));
         } catch (Exception e) {
             FMLLog.severe("CLag: Failed to unload TickProfiler for world " + (world.getClass()), e);
         }

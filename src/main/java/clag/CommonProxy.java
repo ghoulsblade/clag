@@ -5,6 +5,11 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
 public class CommonProxy {
+    public CommonProxy()
+    {
+        FMLLog.info("CLag.ClientProxy constructor");
+    }
+
 	// Client stuff
 	public void registerRenderers() 
 	{
