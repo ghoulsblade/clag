@@ -115,9 +115,9 @@ public class CLagTileEntityTicker {
         public int cz;
         public ChunkInfoPos (int _dim,int _cx,int _cz)
         {
-            dim = dim;
-            cx = cx;
-            cz = cz;
+            dim = _dim;
+            cx = _cx;
+            cz = _cz;
         }
 
         @Override

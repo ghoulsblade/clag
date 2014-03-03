@@ -13,7 +13,8 @@ import java.util.*;
 /*
 * Used to override World.loadedTile/EntityList.
 * */
-public abstract class EntityList<T> extends ArrayList<T> {
+public abstract class EntityList<T> extends ArrayList<T> {	
+	private static final ContextAccess contextAccess = ContextAccess.$;
     protected final ArrayList<T> innerList;
     protected final World world;
     private final Field overridenField;
@@ -46,17 +47,19 @@ public abstract class EntityList<T> extends ArrayList<T> {
         return true;
     }
 
+    /*
     // see https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/util/contextaccess/ContextAccessSecurityManager.java
     public Class getContext(int depth) {
         // Broken on newer JDKs, automatically falls back to security manager implementation when this doesn't work.
         //noinspection deprecation
-        return sun.reflect.Reflection.getCallerClass(depth + 2);
+        //return sun.reflect.Reflection.getCallerClass(depth + 2);
 
         // TODO: check if this might be broken, then we need the ContextAccessSecurityManager thing from nallar/TickProfiler
 
         //  extends SecurityManager
-        // return getClassContext()[depth + 1];
+        return getClassContext()[depth + 1];
     }
+    */
 
     public void unhook() throws IllegalAccessException {
         overridenField.set(world, innerList);
@@ -76,9 +79,9 @@ public abstract class EntityList<T> extends ArrayList<T> {
 
     @Override
     public int size() {
-        boolean tick = isProfiling() && World.class.isAssignableFrom(getContext(1));
+        boolean tick = isProfiling() && World.class.isAssignableFrom(contextAccess.getContext(1));
         if (tick) {
-            Class secondCaller = getContext(2);
+            Class secondCaller = contextAccess.getContext(2);
             if (secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller)) {
                 doTick();
                 return 0;
@@ -197,9 +200,9 @@ public abstract class EntityList<T> extends ArrayList<T> {
 
     @Override
     public Iterator<T> iterator() {
-        boolean tick = isProfiling() && World.class.isAssignableFrom(getContext(1));
+        boolean tick = isProfiling() && World.class.isAssignableFrom(contextAccess.getContext(1));
         if (tick) {
-            Class secondCaller = getContext(2);
+            Class secondCaller = contextAccess.getContext(2);
             if (secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller)) {
                 doTick();
                 return Collections.<T>emptyList().iterator();
