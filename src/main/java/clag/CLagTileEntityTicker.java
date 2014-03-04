@@ -53,14 +53,21 @@ public class CLagTileEntityTicker {
     public void StartTick (int iTickNum) {
         cur_ticknum = iTickNum;
         bIsProfiling = (iTickNum % profile_interval) == 0;
-        if (bIsProfiling) FMLLog.info("CLagTileEntityTicker:StartTick profile "+iTickNum);
+        if (bIsProfiling) 
+        {
+        	worst_chunk_time = 0;
+        	FMLLog.info("CLagTileEntityTicker:StartTick profile "+iTickNum);
+        }
 
         lastchunk_dim = Integer.MAX_VALUE; // make sure cur_ticknum check (sum reset) is done for last used chunk as well
-        if (bIsProfiling) worst_chunk_time = 0;
         ChunkSkipStartTick();
     }
     public void EndTick (int iTickNum) {
-        if (bIsProfiling) FMLLog.info("CLagTileEntityTicker:EndTick profile "+iTickNum+",worst_chunk_time="+worst_chunk_time);
+        if (bIsProfiling) 
+        {
+        	updateWorst();
+        	FMLLog.info("CLagTileEntityTicker:EndTick profile "+iTickNum+",worst_chunk_time="+worst_chunk_time);
+        }
     }
 
     public void runTileEntities(World world, ArrayList<TileEntity> toTick) {
@@ -219,6 +226,18 @@ public class CLagTileEntityTicker {
     public long worst_chunk_dim = 0;
     public long worst_chunk_cx = 0;
     public long worst_chunk_cz = 0;
+    
+    private void updateWorst ()
+    {
+        if (lastchunkinfo != null &&
+            worst_chunk_time < lastchunkinfo.iTimeSum)
+        {
+            worst_chunk_time = lastchunkinfo.iTimeSum;
+            worst_chunk_dim = lastchunk_dim;
+            worst_chunk_cx = lastchunk_cx;
+            worst_chunk_cz = lastchunk_cz;
+        }
+    }
 
     // sum consumed time per chunk
     private void profileAddChunkTime(int dim,int cx,int cz, int x, int y, int z, long dt) {
