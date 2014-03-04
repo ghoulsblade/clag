@@ -1,15 +1,18 @@
 package clag;
 
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
+import cpw.mods.fml.common.FMLLog;
 
 public class CLagUtils {
     // used by chat-commands
@@ -64,4 +67,27 @@ public class CLagUtils {
         }
         return listFields.toArray(new Field[listFields.size()]);
     }
+    
+    
+    // threaded chat to avoid lockup in case something hangs
+    public static void sendChat (EntityPlayerMP p,String txt,EnumChatFormatting fmt)
+    {
+        FMLLog.info("CLagUtils.sendChat %s",txt);
+        final EntityPlayerMP _p = p;
+        final String _txt = txt;
+        final EnumChatFormatting _fmt = fmt;
+	    new Thread() {
+	        @Override
+	        public void run() {
+	            //use chat function here
+	            _p.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(_txt).setColor(_fmt));
+	        }
+	    }.start();
+	}
+    
+    public static void sendChat (EntityPlayerMP p,String txt)
+    {
+    	sendChat(p,txt,EnumChatFormatting.YELLOW);
+    }
+    
 }

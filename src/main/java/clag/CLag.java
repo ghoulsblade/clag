@@ -1,7 +1,18 @@
 // clag = chunklag, localize lag to the chunks causing it by slowing down time inside laggy chunks.
 package clag;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import net.minecraft.command.ServerCommandManager;
+import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -11,16 +22,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityEvent;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 @Mod(modid=CLagInfo.ID, name=CLagInfo.NAME, version=CLagInfo.VERS)
 // @NetworkMod(clientSideRequired=false, serverSideRequired=true)
@@ -33,6 +34,8 @@ public class CLag {
         // Says where the client and server 'proxy' code is loaded.
         @SidedProxy(clientSide=CLagInfo.CLIENTPROXY, serverSide=CLagInfo.COMMONPROXY)
         public static CommonProxy proxy;
+        
+        public File configfile;
         
         @EventHandler
         public void serverStarting(FMLServerStartingEvent event){
@@ -53,17 +56,37 @@ public class CLag {
         //@PreInit    // used in 1.5.2
         public void preInit(FMLPreInitializationEvent event) {
             FMLLog.info("CLag: preInit01");
+            configfile = event.getSuggestedConfigurationFile();
+            loadConfig();
+        }
+        
+        public void loadConfig() {
+            FMLLog.info("CLag: loadConfig01");
 			// you will be able to find the config file in .minecraft/config/ and it will be named Dummy.cfg
 			// here our Configuration has been instantiated, and saved under the name "config"
-			//Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+			Configuration config = new Configuration(configfile);
 			
             // loading the configuration from its file
-            //config.load();
+            config.load();
+			
+			FMLLog.info("CLag: loadConfig02");
 
-            FMLLog.info("CLag: preInit02");
-            // saving the configuration to its file
-            //config.save();
-            FMLLog.info("CLag: preInit05");
+			String cat = Configuration.CATEGORY_GENERAL;
+			CLagTileEntityTicker.profile_interval = config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
+
+			CLagTileEntityTicker.timesum_min_slowA	= config.get(cat, "timesum_min_slowA", CLagTileEntityTicker.timesum_min_slowA).getInt();
+			CLagTileEntityTicker.timesum_min_slowB	= config.get(cat, "timesum_min_slowB", CLagTileEntityTicker.timesum_min_slowB).getInt();
+			CLagTileEntityTicker.timesum_min_slowC	= config.get(cat, "timesum_min_slowC", CLagTileEntityTicker.timesum_min_slowC).getInt();
+
+			CLagTileEntityTicker.slow_down_factorA	= config.get(cat, "slow_down_factorA", CLagTileEntityTicker.slow_down_factorA).getInt();
+			CLagTileEntityTicker.slow_down_factorB	= config.get(cat, "slow_down_factorB", CLagTileEntityTicker.slow_down_factorB).getInt();
+			CLagTileEntityTicker.slow_down_factorC	= config.get(cat, "slow_down_factorC", CLagTileEntityTicker.slow_down_factorC).getInt();
+			
+			FMLLog.info("CLag: loadConfig03");
+			
+			// saving the configuration to its file
+			config.save();
+			FMLLog.info("CLag: loadConfig04");
         }
 
     	// EventManager eventmanager = new EventManager();

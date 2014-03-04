@@ -21,18 +21,30 @@ import java.util.Map;
 public class CLagTileEntityTicker {
     public static CLagTileEntityTicker instance = new CLagTileEntityTicker();
     boolean bIsProfiling = false;
-    public final int PROFILE_INTERVAL = 10*20; // every x*20 seconds
+    public static int profile_interval = 10*20; // every x*20 seconds
     public int cur_ticknum = 0;
 
-    public final long TIMESUM_MICRO = 1000*1; // System.nanoTime -> nano*1000 = micro, micro*1000 = milli
-    public final long TIMESUM_MILLI = 1000*TIMESUM_MICRO;
-    public final long TIMESUM_SECOND = 1000*TIMESUM_MILLI;
-    public final long TIMESUM_TICK = TIMESUM_SECOND/20;
-    public long timesum_min_slow = TIMESUM_TICK/20;
+    public static final long TIMESUM_MICRO = 1000*1; // System.nanoTime -> nano*1000 = micro, micro*1000 = milli
+    public static final long TIMESUM_MILLI = 1000*TIMESUM_MICRO;
+    public static final long TIMESUM_SECOND = 1000*TIMESUM_MILLI;
+    public static final long TIMESUM_TICK = TIMESUM_SECOND/20;
+    public static long timesum_min_slowA = TIMESUM_TICK/100;
+    public static long timesum_min_slowB = TIMESUM_TICK/50;
+    public static long timesum_min_slowC = TIMESUM_TICK/20;
     // public long timesum_min_slow = 10;
 
-    public int slow_down_factor = 20;
+    public static int slow_down_factorA = 4;
+    public static int slow_down_factorB = 10;
+    public static int slow_down_factorC = 20;
 
+    public int getSlowFactor (ChunkInfo o)
+    {
+        if (o.iTimeSum >= timesum_min_slowC) return slow_down_factorC;
+        if (o.iTimeSum >= timesum_min_slowB) return slow_down_factorB;
+        if (o.iTimeSum >= timesum_min_slowA) return slow_down_factorA;
+        return 1;
+    }
+    
     public CLagTileEntityTicker ()
     {
 
@@ -40,7 +52,7 @@ public class CLagTileEntityTicker {
 
     public void StartTick (int iTickNum) {
         cur_ticknum = iTickNum;
-        bIsProfiling = (iTickNum % PROFILE_INTERVAL) == 0;
+        bIsProfiling = (iTickNum % profile_interval) == 0;
         if (bIsProfiling) FMLLog.info("CLagTileEntityTicker:StartTick profile "+iTickNum);
 
         lastchunk_dim = Integer.MAX_VALUE; // make sure cur_ticknum check (sum reset) is done for last used chunk as well
@@ -182,9 +194,10 @@ public class CLagTileEntityTicker {
 
     private boolean calcIsChunkSkippedNow (int dim,int cx,int cz)
     {
-        if ((cur_ticknum % slow_down_factor) == 0) return false;
         ChunkInfo o = getChunkInfo(dim,cx,cz);
-        return o.iTimeSum > timesum_min_slow;
+        int f = getSlowFactor(o);
+        if (f <= 1) return false;
+        return (cur_ticknum % f) != 0; // return false most of the time
     }
 
     /// punish laggy chunks by skipping / slowing time in them
@@ -203,6 +216,9 @@ public class CLagTileEntityTicker {
     private int lastchunk_cz = Integer.MAX_VALUE;
     private ChunkInfo lastchunkinfo = null;
     public long worst_chunk_time = 0;
+    public long worst_chunk_dim = 0;
+    public long worst_chunk_cx = 0;
+    public long worst_chunk_cz = 0;
 
     // sum consumed time per chunk
     private void profileAddChunkTime(int dim,int cx,int cz, int x, int y, int z, long dt) {
@@ -210,7 +226,12 @@ public class CLagTileEntityTicker {
         {
             if (lastchunkinfo != null &&
                 worst_chunk_time < lastchunkinfo.iTimeSum)
+            {
                 worst_chunk_time = lastchunkinfo.iTimeSum;
+                worst_chunk_dim = lastchunk_dim;
+                worst_chunk_cx = lastchunk_cx;
+                worst_chunk_cz = lastchunk_cz;
+            }
             lastchunk_dim = dim;
             lastchunk_cx = cx;
             lastchunk_cz = cz;

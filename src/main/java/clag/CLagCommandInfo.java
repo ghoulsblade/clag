@@ -36,16 +36,17 @@ public class CLagCommandInfo extends CLagCommand {
         int cz = ((int)p.posZ) >> 4;
         CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfo(dim,cx,cz);
         long wt = CLagTileEntityTicker.instance.worst_chunk_time;
-        long mt = CLagTileEntityTicker.instance.timesum_min_slow;
+        long mt = CLagTileEntityTicker.instance.timesum_min_slowA;
 
         String txt = "clag-info: ";
-        txt += " slow="+mt/1000+"µs";
+        txt += " slow="+mt/1000+"mys";
         //txt += " worst-chunk="+wt/1000+"µs";
         long percent = 0;
         if (wt > 0) percent = (100*o.iTimeSum)/wt;
-        txt += " this="+o.iTimeSum/1000+"µs ("+percent+"% of worst)";
+        txt += " this="+o.iTimeSum/1000+"mys ("+percent+"% of worst)";
         txt += " "+o.worst_x+","+o.worst_y+","+o.worst_z;
-        if (o.iTimeSum > mt) txt += " !!!SLOWED(x"+CLagTileEntityTicker.instance.slow_down_factor+")!!! ";
+        int f = CLagTileEntityTicker.instance.getSlowFactor(o);
+        if (f > 1) txt += " !!!SLOWED(x"+f+")!!! ";
 
         chatMessage(sender,txt);
     }
