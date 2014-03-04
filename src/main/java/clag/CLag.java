@@ -57,6 +57,12 @@ public class CLag {
         public void preInit(FMLPreInitializationEvent event) {
             FMLLog.info("CLag: preInit01");
             configfile = event.getSuggestedConfigurationFile();
+            
+
+			FMLLog.info("CLag: timesum_min_slowA "+CLagTileEntityTicker.timesum_min_slowA);
+			FMLLog.info("CLag: timesum_min_slowB "+CLagTileEntityTicker.timesum_min_slowB);
+			FMLLog.info("CLag: timesum_min_slowC "+CLagTileEntityTicker.timesum_min_slowC);
+            
             loadConfig();
         }
         
@@ -74,13 +80,17 @@ public class CLag {
 			String cat = Configuration.CATEGORY_GENERAL;
 			CLagTileEntityTicker.profile_interval = config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
 
-			CLagTileEntityTicker.timesum_min_slowA	= config.get(cat, "timesum_min_slowA", CLagTileEntityTicker.timesum_min_slowA).getInt();
-			CLagTileEntityTicker.timesum_min_slowB	= config.get(cat, "timesum_min_slowB", CLagTileEntityTicker.timesum_min_slowB).getInt();
-			CLagTileEntityTicker.timesum_min_slowC	= config.get(cat, "timesum_min_slowC", CLagTileEntityTicker.timesum_min_slowC).getInt();
+			CLagTileEntityTicker.timesum_min_slowA	= (long)config.get(cat, "timesum_min_slowA", ""+CLagTileEntityTicker.timesum_min_slowA).getDouble(0.0);
+			CLagTileEntityTicker.timesum_min_slowB	= (long)config.get(cat, "timesum_min_slowB", ""+CLagTileEntityTicker.timesum_min_slowB).getDouble(0.0);
+			CLagTileEntityTicker.timesum_min_slowC	= (long)config.get(cat, "timesum_min_slowC", ""+CLagTileEntityTicker.timesum_min_slowC).getDouble(0.0);
 
-			CLagTileEntityTicker.slow_down_factorA	= config.get(cat, "slow_down_factorA", CLagTileEntityTicker.slow_down_factorA).getInt();
-			CLagTileEntityTicker.slow_down_factorB	= config.get(cat, "slow_down_factorB", CLagTileEntityTicker.slow_down_factorB).getInt();
-			CLagTileEntityTicker.slow_down_factorC	= config.get(cat, "slow_down_factorC", CLagTileEntityTicker.slow_down_factorC).getInt();
+			CLagTileEntityTicker.slow_down_factorA	= config.get(cat, "slow_down_factorA", ""+CLagTileEntityTicker.slow_down_factorA).getInt();
+			CLagTileEntityTicker.slow_down_factorB	= config.get(cat, "slow_down_factorB", ""+CLagTileEntityTicker.slow_down_factorB).getInt();
+			CLagTileEntityTicker.slow_down_factorC	= config.get(cat, "slow_down_factorC", ""+CLagTileEntityTicker.slow_down_factorC).getInt();
+
+			FMLLog.info("CLag: timesum_min_slowA "+CLagTileEntityTicker.timesum_min_slowA);
+			FMLLog.info("CLag: timesum_min_slowB "+CLagTileEntityTicker.timesum_min_slowB);
+			FMLLog.info("CLag: timesum_min_slowC "+CLagTileEntityTicker.timesum_min_slowC);
 			
 			FMLLog.info("CLag: loadConfig03");
 			
