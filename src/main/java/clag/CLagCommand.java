@@ -83,8 +83,8 @@ public class CLagCommand extends CommandBase {
         }
         else
         {
-            chatMessage(sender,"clag unknown subcommand");
-            chatMessage(sender,"start,stop,minslow [A] [B] [C],worst,reload,slow [NUMTICKS]");
+        	CLagUtils.chatMessage(sender,"clag unknown subcommand");
+        	CLagUtils.chatMessage(sender,"start,stop,minslow [A] [B] [C],worst,reload,slow [NUMTICKS]");
         }
     }
 
