@@ -36,38 +36,37 @@ public class CLag {
         public static CommonProxy proxy;
         
         public File configfile;
-        
+        public static boolean debug = true;
         @EventHandler
         public void serverStarting(FMLServerStartingEvent event){
-        	FMLLog.info("CLag: serverStarting 01");
-        	ServerCommandManager scm = (ServerCommandManager)event.getServer().getCommandManager();
-        	FMLLog.info("CLag: adding commands...");
-        	FMLLog.info("CLag: serverStarting 02");
-            scm.registerCommand(new CLagCommand());
-            scm.registerCommand(new CLagCommandInfo());
-        	FMLLog.info("CLag: serverStarting 03");
+        	CLagUtils.debug("CLag: serverStarting 01");
+	        CLagUtils.debug("CLag: adding commands...");
+	        CLagUtils.debug("CLag: serverStarting 02");
+            event.registerServerCommand(new CLagCommand());
+            event.registerServerCommand(new CLagCommandInfo());
+	        CLagUtils.debug("CLag: serverStarting 03");
 
             // autostart
-            FMLLog.info("CLag: autostarting profiling+slowing...");
+	        CLagUtils.debug("CLag: autostarting profiling+slowing...");
             startCLag();
         }
         
         @EventHandler // used in 1.6.2
         //@PreInit    // used in 1.5.2
         public void preInit(FMLPreInitializationEvent event) {
-            FMLLog.info("CLag: preInit01");
+	        CLagUtils.debug("CLag: preInit01");
             configfile = event.getSuggestedConfigurationFile();
-            
 
-			FMLLog.info("CLag: timesum_min_slowA "+CLagTileEntityTicker.timesum_min_slowA);
-			FMLLog.info("CLag: timesum_min_slowB "+CLagTileEntityTicker.timesum_min_slowB);
-			FMLLog.info("CLag: timesum_min_slowC "+CLagTileEntityTicker.timesum_min_slowC);
+
+	        CLagUtils.debug("CLag: timesum_min_slowA " + CLagTileEntityTicker.timesum_min_slowA);
+	        CLagUtils.debug("CLag: timesum_min_slowB " + CLagTileEntityTicker.timesum_min_slowB);
+	        CLagUtils.debug("CLag: timesum_min_slowC " + CLagTileEntityTicker.timesum_min_slowC);
             
             loadConfig();
         }
         
         public void loadConfig() {
-            FMLLog.info("CLag: loadConfig01");
+	        CLagUtils.debug("CLag: loadConfig01");
 			// you will be able to find the config file in .minecraft/config/ and it will be named Dummy.cfg
 			// here our Configuration has been instantiated, and saved under the name "config"
 			Configuration config = new Configuration(configfile);
@@ -78,6 +77,7 @@ public class CLag {
 			FMLLog.info("CLag: loadConfig02");
 
 			String cat = Configuration.CATEGORY_GENERAL;
+	        debug                                   = config.get(cat, "debug"           , true).getBoolean(true);
 			CLagTileEntityTicker.profile_interval	= config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
 			CLagTileEntityTicker.warn_interval		= config.get(cat, "warn_interval"	, CLagTileEntityTicker.warn_interval).getInt();
 			CLagTileEntityTicker.warn_radius		= config.get(cat, "warn_radius"		, CLagTileEntityTicker.warn_radius).getInt();
@@ -89,21 +89,21 @@ public class CLag {
 			CLagTileEntityTicker.slow_down_factorA	= config.get(cat, "slow_down_factorA", ""+CLagTileEntityTicker.slow_down_factorA).getInt();
 			CLagTileEntityTicker.slow_down_factorB	= config.get(cat, "slow_down_factorB", ""+CLagTileEntityTicker.slow_down_factorB).getInt();
 			CLagTileEntityTicker.slow_down_factorC	= config.get(cat, "slow_down_factorC", ""+CLagTileEntityTicker.slow_down_factorC).getInt();
-			
 
-			FMLLog.info("CLag: profile_interval "+CLagTileEntityTicker.profile_interval);
-			FMLLog.info("CLag: warn_interval "+CLagTileEntityTicker.warn_interval);
-			FMLLog.info("CLag: warn_radius "+CLagTileEntityTicker.warn_radius);
-		
-			FMLLog.info("CLag: timesum_min_slowA "+CLagTileEntityTicker.timesum_min_slowA);
-			FMLLog.info("CLag: timesum_min_slowB "+CLagTileEntityTicker.timesum_min_slowB);
-			FMLLog.info("CLag: timesum_min_slowC "+CLagTileEntityTicker.timesum_min_slowC);
-			
-			FMLLog.info("CLag: loadConfig03");
+
+	        CLagUtils.debug("CLag: profile_interval " + CLagTileEntityTicker.profile_interval);
+	        CLagUtils.debug("CLag: warn_interval " + CLagTileEntityTicker.warn_interval);
+	        CLagUtils.debug("CLag: warn_radius " + CLagTileEntityTicker.warn_radius);
+
+	        CLagUtils.debug("CLag: timesum_min_slowA " + CLagTileEntityTicker.timesum_min_slowA);
+	        CLagUtils.debug("CLag: timesum_min_slowB " + CLagTileEntityTicker.timesum_min_slowB);
+	        CLagUtils.debug("CLag: timesum_min_slowC " + CLagTileEntityTicker.timesum_min_slowC);
+
+	        CLagUtils.debug("CLag: loadConfig03");
 			
 			// saving the configuration to its file
 			config.save();
-			FMLLog.info("CLag: loadConfig04");
+	        CLagUtils.debug("CLag: loadConfig04");
         }
 
     	// EventManager eventmanager = new EventManager();
@@ -111,12 +111,12 @@ public class CLag {
         @EventHandler // used in 1.6.2
         //@Init       // used in 1.5.2
         public void load(FMLInitializationEvent event) {
-            FMLLog.info("CLag: load 01");
+	        CLagUtils.debug("CLag: load 01");
             proxy.registerTickHandler();
-            FMLLog.info("CLag: load 2");
+	        CLagUtils.debug("CLag: load 2");
 
             MinecraftForge.EVENT_BUS.register(this);
-            FMLLog.info("CLag: load 3");
+	        CLagUtils.debug("CLag: load 3");
         }
        
         @EventHandler // used in 1.6.2
@@ -168,7 +168,7 @@ public class CLag {
 
     // based on https://github.com/nallar/TickProfiler/blob/0449ed2bf76884bcf18847562f8235f3a2e44e9b/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
     public boolean startCLag(final Collection<World> worlds_) {
-        FMLLog.info("CLag: startCLag for #worlds= " + worlds_.size());
+	    CLagUtils.debug("CLag: startCLag for #worlds= " + worlds_.size());
         final Collection<World> worlds = new ArrayList<World>(worlds_);
         synchronized (CLag.class) {
             for (World world_ : worlds) {
@@ -182,7 +182,7 @@ public class CLag {
 
     // based on https://github.com/nallar/TickProfiler/blob/0449ed2bf76884bcf18847562f8235f3a2e44e9b/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
     public boolean stopCLag(final Collection<World> worlds_) {
-        FMLLog.info("CLag: stopCLag for #worlds= " + worlds_.size());
+	    CLagUtils.debug("CLag: stopCLag for #worlds= " + worlds_.size());
         final Collection<World> worlds = new ArrayList<World>(worlds_);
         synchronized (CLag.class) {
             for (World world_ : worlds) {
@@ -203,7 +203,7 @@ public class CLag {
             new LoadedTileEntityList(world, loadedTileEntityField);
             //Field loadedEntityField = CLagUtils.getFields(World.class, List.class)[loadedEntityFieldIndex];
             //new LoadedEntityList(world, loadedEntityField);
-            FMLLog.info("CLag: Profiling hooked for world " + (world.getClass()));
+	        CLagUtils.debug("CLag: Profiling hooked for world " + (world.getClass()));
         } catch (Exception e) {
             FMLLog.severe("CLag: Failed to initialise profiling for world " + (world.getClass()), e);
         }
@@ -231,7 +231,7 @@ public class CLag {
             } else {
                 FMLLog.severe("CLag: Looks like another mod broke TickProfiler's replacement entity list in world: " + (world.getClass()));
             }*/
-            FMLLog.info("CLag: Profiling unhooked for world " + (world.getClass()));
+	        CLagUtils.debug("CLag: Profiling unhooked for world " + (world.getClass()));
         } catch (Exception e) {
             FMLLog.severe("CLag: Failed to unload TickProfiler for world " + (world.getClass()), e);
         }

@@ -11,32 +11,24 @@ import static net.minecraft.util.EnumChatFormatting.*;
 
 public class CLagCommand extends CommandBase {
 
+	@Override
     public String getCommandName()
     {
         return "clag";
     }
 
-    public int getRequiredPermissionLevel()
-    {
-        return 2;
-    }
-
+	@Override
     public String getCommandUsage(ICommandSender par1ICommandSender)
     {
         return "commands.clag.usage";
     }
 
-    public void chatMessage (ICommandSender sender, String txt)
-    {
-        FMLLog.info("CLagCommand: chatMessage %s",txt);
-        sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(txt).setColor(RED));
-    }
-
+	@Override
     public void processCommand(ICommandSender sender, String[] par2ArrayOfStr)
     {
         if (par2ArrayOfStr.length < 1) return;
         String sub = par2ArrayOfStr[0];
-        FMLLog.info("CLagCommand: exec "+sub);
+        CLagUtils.debug("CLagCommand: exec "+sub);
         /*
         int a = parseIntWithMin(par1ICommandSender, par2ArrayOfStr[0], 0);
         */
@@ -61,7 +53,7 @@ public class CLagCommand extends CommandBase {
             CLagTileEntityTicker.instance.timesum_min_slowA = a;
             CLagTileEntityTicker.instance.timesum_min_slowB = b;
             CLagTileEntityTicker.instance.timesum_min_slowC = c;
-            chatMessage(sender,"clag minslow="+a+","+b+","+c);
+            CLagUtils.chatMessage(sender, "clag minslow=" + a + "," + b + "," + c);
         }
         else if(sub.equals("worst"))
         {
@@ -74,7 +66,7 @@ public class CLagCommand extends CommandBase {
         	txt += " x="+o.worst_chunk_cx*16;
         	txt += " z="+o.worst_chunk_cz*16;
             txt += " time="+o.worst_chunk_time/1000+"mys";
-            chatMessage(sender,txt);
+	        CLagUtils.chatMessage(sender, txt);
         }
         else if(sub.equals("reload"))
         {
@@ -83,7 +75,7 @@ public class CLagCommand extends CommandBase {
         else if(sub.equals("slow")) // force-slow the chunk the player is currently standing in
         {
             int until_tick = Integer.MAX_VALUE;
-            if (par2ArrayOfStr.length >= 2) 
+            if (par2ArrayOfStr.length >= 2)
             	until_tick = CLagTileEntityTicker.instance.cur_ticknum + parseIntWithMin(sender, par2ArrayOfStr[1], 0);
 
             CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfoAtPlayer(p);
@@ -96,11 +88,11 @@ public class CLagCommand extends CommandBase {
         }
     }
 
-    // compareTo added to make intellij environment happy, not needed on eclipse
-    @Override
-    public int compareTo(Object o) {
-        if (o == null) return 0;
-        if (o instanceof ICommand) return this.getCommandName().compareTo(((ICommand)o).getCommandName());
-        return 0;
-    }
+	// compareTo added to make intellij environment happy, not needed on eclipse
+	@Override
+	public int compareTo(Object o) {
+		return 0;
+	}
+
+
 }

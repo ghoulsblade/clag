@@ -28,7 +28,7 @@ class ContextAccessProvider {
 				}
 				return contextAccess;
 			} catch (Throwable t) {
-				FMLLog.info("Unable to set up context access class " + clazz + ". " + t.getMessage() + ", falling back to slower context access. On JRE: " + System.getProperty("java.version"));				
+				CLagUtils.debug("Unable to set up context access class " + clazz + ". " + t.getMessage() + ", falling back to slower context access. On JRE: " + System.getProperty("java.version"));
 			}
 		}
 		throw new Error("Failed to set up any context access");

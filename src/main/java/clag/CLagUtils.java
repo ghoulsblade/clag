@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import cpw.mods.fml.common.FMLLog;
 
+import static net.minecraft.util.EnumChatFormatting.RED;
+
 public class CLagUtils {
     // used by chat-commands
     public static EntityPlayerMP getPlayerByCmdSender (ICommandSender par1ICommandSender)
@@ -74,7 +76,7 @@ public class CLagUtils {
     // threaded chat to avoid lockup in case something hangs
     public static void sendChat (EntityPlayerMP p,String txt,EnumChatFormatting fmt)
     {
-        FMLLog.info("CLagUtils.sendChat %s",txt);
+        FMLLog.info("CLagUtils.sendChat %s", txt);
         final EntityPlayerMP _p = p;
         final String _txt = txt;
         final EnumChatFormatting _fmt = fmt;
@@ -118,5 +120,17 @@ public class CLagUtils {
         }
     	return f_p;
     }
-    
+
+	public static void debug(String message){
+		if( CLag.debug ){
+			FMLLog.info(message);
+		}
+	}
+
+	public static void chatMessage (ICommandSender sender, String txt)
+	{
+		FMLLog.info("CLagCommand: chatMessage %s",txt);
+		sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(txt).setColor(RED));
+	}
+
 }
