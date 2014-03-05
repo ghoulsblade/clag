@@ -82,7 +82,9 @@ public class CLag {
 			CLagTileEntityTicker.warn_interval		= config.get(cat, "warn_interval"	, CLagTileEntityTicker.warn_interval).getInt();
 			CLagTileEntityTicker.warn_radius		= config.get(cat, "warn_radius"		, CLagTileEntityTicker.warn_radius).getInt();
 			CLagTileEntityTicker.max_warn_number_of_players	 = config.get(cat, "max_warn_number_of_players"		, CLagTileEntityTicker.max_warn_number_of_players).getInt();
-
+			CLagTileEntityTicker.warn_text			= config.get(cat, "warn_text"		, CLagTileEntityTicker.warn_text).getString();
+			
+			
 			CLagTileEntityTicker.timesum_min_slowA	= (long)config.get(cat, "timesum_min_slowA", ""+CLagTileEntityTicker.timesum_min_slowA).getDouble(0.0);
 			CLagTileEntityTicker.timesum_min_slowB	= (long)config.get(cat, "timesum_min_slowB", ""+CLagTileEntityTicker.timesum_min_slowB).getDouble(0.0);
 			CLagTileEntityTicker.timesum_min_slowC	= (long)config.get(cat, "timesum_min_slowC", ""+CLagTileEntityTicker.timesum_min_slowC).getDouble(0.0);
