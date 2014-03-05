@@ -72,6 +72,15 @@ public class CLagCommand extends CommandBase {
         {
         	CLag.instance.loadConfig();
         }
+        else if(sub.equals("slow")) // force-slow the chunk the player is currently standing in
+        {
+            int until_tick = Integer.MAX_VALUE;
+            if (par2ArrayOfStr.length >= 2)
+            	until_tick = CLagTileEntityTicker.instance.cur_ticknum + parseIntWithMin(sender, par2ArrayOfStr[1], 0);
+
+            CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfoAtPlayer(p);
+            if (o != null) o.force_slow_until_tick = until_tick;
+        }
         else
         {
 	        CLagUtils.chatMessage(sender, "clag unknown subcommand");

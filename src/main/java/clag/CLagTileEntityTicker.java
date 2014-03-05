@@ -59,6 +59,7 @@ public class CLagTileEntityTicker {
     
     public int getSlowFactor (ChunkInfo o)
     {
+    	if (cur_ticknum < o.force_slow_until_tick) return slow_down_factorC;
         if (o.iTimeSum >= timesum_min_slowC) return slow_down_factorC;
         if (o.iTimeSum >= timesum_min_slowB) return slow_down_factorB;
         if (o.iTimeSum >= timesum_min_slowA) return slow_down_factorA;
@@ -89,6 +90,7 @@ public class CLagTileEntityTicker {
     	if (p == null) return;
     	String txt = warn_text;
     	txt += " "+(o.pos.cx*16+8)+","+(o.pos.cz*16+8);
+    	txt += " : "+o.worst_x+","+o.worst_y+","+o.worst_z;
     	CLagUtils.sendChat(p,txt);
     }
     
@@ -218,6 +220,7 @@ public class CLagTileEntityTicker {
         public int worst_x;
         public int worst_y;
         public int worst_z;
+        public int force_slow_until_tick;
         public ChunkInfoPos pos;
         public ChunkInfo (ChunkInfoPos _pos)
         {
@@ -225,6 +228,7 @@ public class CLagTileEntityTicker {
             iTimeSum = 0;
             worst_time = 0;
             pos = _pos;
+            force_slow_until_tick = 0;
         }
     }
 
@@ -241,6 +245,14 @@ public class CLagTileEntityTicker {
             mChunkInfo.put(coord, o);
         }
         return o;
+    }
+
+    public ChunkInfo getChunkInfoAtPlayer (EntityPlayerMP p)
+    {
+        int dim = p.dimension;
+        int cx = ((int)p.posX) >> 4;
+        int cz = ((int)p.posZ) >> 4;
+        return getChunkInfo(dim,cx,cz);
     }
 
     // ---------- internals

@@ -31,11 +31,7 @@ public class CLagCommandInfo extends CommandBase {
         EntityPlayerMP p = CLagUtils.getPlayerByCmdSender(sender); // par1ICommandSender.getCommandSenderName()
         WorldServer w = p.getServerForPlayer();
 
-        int dim = p.dimension;
-
-        int cx = ((int)p.posX) >> 4;
-        int cz = ((int)p.posZ) >> 4;
-        CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfo(dim,cx,cz);
+        CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfoAtPlayer(p);
         long wt = CLagTileEntityTicker.instance.worst_chunk_time;
         long mt = CLagTileEntityTicker.instance.timesum_min_slowA;
 
