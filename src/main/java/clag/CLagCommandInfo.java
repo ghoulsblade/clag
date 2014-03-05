@@ -1,6 +1,7 @@
 package clag;
 
 import cpw.mods.fml.common.FMLLog;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
@@ -8,15 +9,10 @@ import net.minecraft.world.WorldServer;
 /**
  * Created by ghoul on 02.03.14.
  */
-public class CLagCommandInfo extends CLagCommand {
+public class CLagCommandInfo extends CommandBase {
     public String getCommandName()
     {
         return "clag-info";
-    }
-
-    public int getRequiredPermissionLevel()
-    {
-        return 0;
     }
 
     public String getCommandUsage(ICommandSender par1ICommandSender)
@@ -32,6 +28,7 @@ public class CLagCommandInfo extends CLagCommand {
         WorldServer w = p.getServerForPlayer();
 
         int dim = p.dimension;
+
         int cx = ((int)p.posX) >> 4;
         int cz = ((int)p.posZ) >> 4;
         CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfo(dim,cx,cz);
@@ -48,6 +45,11 @@ public class CLagCommandInfo extends CLagCommand {
         int f = CLagTileEntityTicker.instance.getSlowFactor(o);
         if (f > 1) txt += " !!!SLOWED(x"+f+")!!! ";
 
-        chatMessage(sender,txt);
+        CLagUtils.chatMessage(sender, txt);
     }
+
+	@Override
+	public int compareTo(Object o) {
+		return 0;
+	}
 }
