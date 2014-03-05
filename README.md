@@ -6,8 +6,8 @@ minecraft mod to slow down time in chunks causing lag
 about
 ====
 
-Cpu time taken by ticking the tile entities is measured in regular intervals (not every tick),
-and summed up per chunk to find which chunks are causing lag.
+CPU-time taken by ticking the tile entities is measured in regular intervals (not every tick),
+and summed up per chunk to find out which chunks are causing lag.
 In laggy chunks time is slowed down by skipping ticks for tile entities.
 
 tech: similar to tickprofiler and tickthreading, we replace World.loadedTileEntity by our own class that overides iteration behavior.
@@ -43,17 +43,17 @@ ideas
 * option to destroy worst tile-entity if chunk-time is over a certain threshold
 * block that emits redstone signal when tps is below a certain number -> allow players to turn off farms and big machines automatically
 
-TODO
+todo
 ====
 
 * currently only tile-entities are profiled and slowed, next should be mobile entities (mobs, items)
 * design patch for tickprofiler to allow nesting of tile-entity hooks to fix the conflict, will need tick-profiler patch too
 
 
-Possible conflicts with other mods 
+possible conflicts with other mods 
 ====
 
-Possible conflict with tickprofiler and tickthreading, since the override the same var.
+Possible conflict with tickprofiler and tickthreading, since they override the same var (World.loadedTileEntityList).
 Best way to solve the tickprofiler conflict would be to suggest an interface to them to allow nesting of overrides.
 In the meantime it should be sufficient to turn off clag by chat command temporarily while doing a tick measurement.
 If TickThreading is in use (not possible for dw20 pack at the time of writing) clag might not needed, 
