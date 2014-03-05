@@ -36,7 +36,7 @@ public class CLag {
         public static CommonProxy proxy;
         
         public File configfile;
-        public static boolean debug = true;
+        public static boolean debug;
         @EventHandler
         public void serverStarting(FMLServerStartingEvent event){
         	CLagUtils.debug("CLag: serverStarting 01");
