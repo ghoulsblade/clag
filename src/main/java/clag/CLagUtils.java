@@ -99,7 +99,7 @@ public class CLagUtils {
         Iterator iterator = world.playerEntities.iterator();
         
         EntityPlayerMP f_p = null;
-        double f_d = max_radius;
+        double f_d = max_radius*max_radius;
         double mx = cx*16 + 8;
         double mz = cz*16 + 8;
 
