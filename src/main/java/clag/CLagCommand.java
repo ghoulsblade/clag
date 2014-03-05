@@ -81,6 +81,11 @@ public class CLagCommand extends CommandBase {
             CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfoAtPlayer(p);
             if (o != null) o.force_slow_until_tick = until_tick;
         }
+        else if(sub.equals("warn")) // force-slow the chunk the player is currently standing in
+        {
+        	CLagTileEntityTicker.instance.last_warn_tick = Integer.MIN_VALUE;
+        	CLagUtils.chatMessage(sender,"resetting warning interval");
+        }
         else
         {
         	CLagUtils.chatMessage(sender,"clag unknown subcommand");
