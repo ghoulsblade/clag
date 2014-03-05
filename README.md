@@ -26,14 +26,14 @@ chat commands
 
 * /clag-info : for players, shows information about the current chunk
 * /clag [subcmd] : admin only
-** /clag stop : uinstall hook, disables clag-profiling and slowing. allows use of tickprofiler
-** /clag start : reinstall hook
-** /clag minslow [A] [B] [C] : set time-per-chunk thresholds, in nanoseconds, A=x4 B=x10 C=x20 by default
-** /clag worst : list coords and time of worst chunk
-** /clag reload : reload config file
-** /clag slow : force slowdown current chunk 
-** /clag slow [X] : force slowdown current chunk for the next [X] ticks
-** /clag warn : reset warning interval, player warnings will be sent on next profile tick
+* /clag stop : uinstall hook, disables clag-profiling and slowing. allows use of tickprofiler
+* /clag start : reinstall hook
+* /clag minslow [A] [B] [C] : set time-per-chunk thresholds, in nanoseconds, A=x4 B=x10 C=x20 by default
+* /clag worst : list coords and time of worst chunk
+* /clag reload : reload config file
+* /clag slow : force slowdown current chunk 
+* /clag slow [X] : force slowdown current chunk for the next [X] ticks
+* /clag warn : reset warning interval, player warnings will be sent on next profile tick
 
 
 ideas
