@@ -36,7 +36,7 @@ public class CLagCommand extends CommandBase {
     {
         if (par2ArrayOfStr.length < 1) return;
         String sub = par2ArrayOfStr[0];
-        FMLLog.info("CLagCommand: exec "+sub);
+        CLagUtils.debug("CLagCommand: exec "+sub);
         /*
         int a = parseIntWithMin(par1ICommandSender, par2ArrayOfStr[0], 0);
         */

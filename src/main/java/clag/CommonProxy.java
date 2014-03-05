@@ -3,11 +3,12 @@ package clag;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
+import clag.CLagUtils;
 
 public class CommonProxy {
     public CommonProxy()
     {
-        FMLLog.info("CLag.ClientProxy constructor");
+	    CLagUtils.debug("CLag.ClientProxy constructor");
     }
 
 	// Client stuff
@@ -18,8 +19,8 @@ public class CommonProxy {
 
 	public void registerTickHandler () 
 	{
-		FMLLog.info("CLag: CommonProxy.registerTickHandler 01");
+		CLagUtils.debug("CLag: CommonProxy.registerTickHandler 01");
         TickRegistry.registerTickHandler(new CLagTickHandler(), Side.SERVER);
-		FMLLog.info("CLag: CommonProxy.registerTickHandler 02");
+		CLagUtils.debug("CLag: CommonProxy.registerTickHandler 02");
 	}
 }

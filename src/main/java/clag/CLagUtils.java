@@ -118,5 +118,11 @@ public class CLagUtils {
         }
     	return f_p;
     }
+
+	public static void debug(String message){
+		if( CLag.debug ){
+			FMLLog.info(message);
+		}
+	}
     
 }

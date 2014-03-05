@@ -26,7 +26,7 @@ public class CLagCommandInfo extends CLagCommand {
 
     public void processCommand(ICommandSender sender, String[] par2ArrayOfStr)
     {
-        FMLLog.info("CLagCommandInfo");
+        CLagUtils.debug("CLagCommandInfo");
 
         EntityPlayerMP p = CLagUtils.getPlayerByCmdSender(sender); // par1ICommandSender.getCommandSenderName()
         WorldServer w = p.getServerForPlayer();

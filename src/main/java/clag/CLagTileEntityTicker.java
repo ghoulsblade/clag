@@ -101,14 +101,14 @@ public class CLagTileEntityTicker {
         if (bIsProfiling) 
         {
         	worst_chunk_time = 0;
-        	FMLLog.info("CLagTileEntityTicker:StartTick profile "+iTickNum);
+        	CLagUtils.debug("CLagTileEntityTicker:StartTick profile "+iTickNum);
         	
         	// warning nearby players
         	if (iTickNum >= last_warn_tick + warn_interval)
         	{
         		last_warn_tick = iTickNum;
         		bIsWarning = true;
-            	FMLLog.info("CLagTileEntityTicker:StartTick warning=true");
+            	CLagUtils.debug("CLagTileEntityTicker:StartTick warning=true");
         		warnStartTick();
         	}
         }
@@ -122,7 +122,7 @@ public class CLagTileEntityTicker {
         {
         	if (bIsWarning) warnEndTick();
         	updateWorst();
-        	FMLLog.info("CLagTileEntityTicker:EndTick profile "+iTickNum+",worst_chunk_time="+worst_chunk_time);
+        	CLagUtils.debug("CLagTileEntityTicker:EndTick profile "+iTickNum+",worst_chunk_time="+worst_chunk_time);
         }
     }
 

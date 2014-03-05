@@ -7,15 +7,15 @@ import cpw.mods.fml.relauncher.Side;
 public class ClientProxy extends CommonProxy {
     public ClientProxy()
     {
-        FMLLog.info("CLag.ClientProxy constructor");
+	    CLagUtils.debug("CLag.ClientProxy constructor");
     }
 
 	@Override
 	public void registerTickHandler () 
 	{
 		// needed here for "server" part on singleplayer 2x clientproxy, distinguished by Side.SERVER param to TickRegistry
-        FMLLog.info("CLag: ClientProxy.registerTickHandler 01");
+		CLagUtils.debug("CLag: ClientProxy.registerTickHandler 01");
         TickRegistry.registerTickHandler(new CLagTickHandler(), Side.SERVER);
-        FMLLog.info("CLag: ClientProxy.registerTickHandler 02");
+		CLagUtils.debug("CLag: ClientProxy.registerTickHandler 02");
 	}
 }
