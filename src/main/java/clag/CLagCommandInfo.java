@@ -10,16 +10,20 @@ import net.minecraft.world.WorldServer;
  * Created by ghoul on 02.03.14.
  */
 public class CLagCommandInfo extends CommandBase {
+
+	@Override
     public String getCommandName()
     {
         return "clag-info";
     }
 
+	@Override
     public String getCommandUsage(ICommandSender par1ICommandSender)
     {
         return "commands.clag-info.usage";
     }
 
+	@Override
     public void processCommand(ICommandSender sender, String[] par2ArrayOfStr)
     {
         CLagUtils.debug("CLagCommandInfo");

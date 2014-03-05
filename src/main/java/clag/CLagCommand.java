@@ -11,16 +11,19 @@ import static net.minecraft.util.EnumChatFormatting.*;
 
 public class CLagCommand extends CommandBase {
 
+	@Override
     public String getCommandName()
     {
         return "clag";
     }
-	
+
+	@Override
     public String getCommandUsage(ICommandSender par1ICommandSender)
     {
         return "commands.clag.usage";
     }
 
+	@Override
     public void processCommand(ICommandSender sender, String[] par2ArrayOfStr)
     {
         if (par2ArrayOfStr.length < 1) return;
@@ -50,7 +53,7 @@ public class CLagCommand extends CommandBase {
             CLagTileEntityTicker.instance.timesum_min_slowA = a;
             CLagTileEntityTicker.instance.timesum_min_slowB = b;
             CLagTileEntityTicker.instance.timesum_min_slowC = c;
-            CLagUtils.chatMessage(sender,"clag minslow="+a+","+b+","+c);
+            CLagUtils.chatMessage(sender, "clag minslow=" + a + "," + b + "," + c);
         }
         else if(sub.equals("worst"))
         {
@@ -63,7 +66,7 @@ public class CLagCommand extends CommandBase {
         	txt += " x="+o.worst_chunk_cx*16;
         	txt += " z="+o.worst_chunk_cz*16;
             txt += " time="+o.worst_chunk_time/1000+"mys";
-	        CLagUtils.chatMessage(sender,txt);
+	        CLagUtils.chatMessage(sender, txt);
         }
         else if(sub.equals("reload"))
         {
@@ -71,8 +74,8 @@ public class CLagCommand extends CommandBase {
         }
         else
         {
-	        CLagUtils.chatMessage(sender,"clag unknown subcommand");
-	        CLagUtils.chatMessage(sender,"start,stop,minslow [A] [B] [C],worst,reload");
+	        CLagUtils.chatMessage(sender, "clag unknown subcommand");
+	        CLagUtils.chatMessage(sender, "start,stop,minslow [A] [B] [C],worst,reload");
         }
     }
 
