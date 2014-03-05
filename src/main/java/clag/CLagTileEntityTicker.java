@@ -90,6 +90,7 @@ public class CLagTileEntityTicker {
     	if (p == null) return;
     	String txt = warn_text;
     	txt += " "+(o.pos.cx*16+8)+","+(o.pos.cz*16+8);
+    	txt += " : "+o.worst_x+","+o.worst_y+","+o.worst_z;
     	CLagUtils.sendChat(p,txt);
     }
     
