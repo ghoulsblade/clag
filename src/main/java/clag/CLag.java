@@ -37,6 +37,7 @@ public class CLag {
         
         public File configfile;
         public static boolean debug;
+
         @EventHandler
         public void serverStarting(FMLServerStartingEvent event){
         	CLagUtils.debug("CLag: serverStarting 01");

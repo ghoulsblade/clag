@@ -45,6 +45,8 @@ public class CLagTileEntityTicker {
     public static int slow_down_factorB = 10;
     public static int slow_down_factorC = 20;
     
+    public static int max_warn_number_of_players = 20;
+
 
     public HashSet<ChunkInfo> warnset = new HashSet<ChunkInfo>(); //HashSet instance without any element
 
@@ -79,19 +81,22 @@ public class CLagTileEntityTicker {
     
     public void warnEndTick ()
     {
+    	int c = 0;
 		for (ChunkInfo o : warnset) {
-			warnNearestPlayer(o);
+			c += warnNearestPlayer(o);
+			if (c >= max_warn_number_of_players) break; // sanity check
 		}
     }
     
-    public void warnNearestPlayer (ChunkInfo o)
+    public int warnNearestPlayer (ChunkInfo o)
     {
     	EntityPlayerMP p = CLagUtils.findNearestPlayer(o.pos.dim,o.pos.cx,o.pos.cz,warn_radius);
-    	if (p == null) return;
+    	if (p == null) return 0;
     	String txt = warn_text;
     	txt += " "+(o.pos.cx*16+8)+","+(o.pos.cz*16+8);
     	txt += " : "+o.worst_x+","+o.worst_y+","+o.worst_z;
     	CLagUtils.sendChat(p,txt);
+    	return 1;
     }
     
     // ----------------------------- tick
