@@ -78,7 +78,9 @@ public class CLag {
 			FMLLog.info("CLag: loadConfig02");
 
 			String cat = Configuration.CATEGORY_GENERAL;
-			CLagTileEntityTicker.profile_interval = config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
+			CLagTileEntityTicker.profile_interval	= config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
+			CLagTileEntityTicker.warn_interval		= config.get(cat, "warn_interval"	, CLagTileEntityTicker.warn_interval).getInt();
+			CLagTileEntityTicker.warn_radius		= config.get(cat, "warn_radius"		, CLagTileEntityTicker.warn_radius).getInt();
 
 			CLagTileEntityTicker.timesum_min_slowA	= (long)config.get(cat, "timesum_min_slowA", ""+CLagTileEntityTicker.timesum_min_slowA).getDouble(0.0);
 			CLagTileEntityTicker.timesum_min_slowB	= (long)config.get(cat, "timesum_min_slowB", ""+CLagTileEntityTicker.timesum_min_slowB).getDouble(0.0);
@@ -87,7 +89,12 @@ public class CLag {
 			CLagTileEntityTicker.slow_down_factorA	= config.get(cat, "slow_down_factorA", ""+CLagTileEntityTicker.slow_down_factorA).getInt();
 			CLagTileEntityTicker.slow_down_factorB	= config.get(cat, "slow_down_factorB", ""+CLagTileEntityTicker.slow_down_factorB).getInt();
 			CLagTileEntityTicker.slow_down_factorC	= config.get(cat, "slow_down_factorC", ""+CLagTileEntityTicker.slow_down_factorC).getInt();
+			
 
+			FMLLog.info("CLag: profile_interval "+CLagTileEntityTicker.profile_interval);
+			FMLLog.info("CLag: warn_interval "+CLagTileEntityTicker.warn_interval);
+			FMLLog.info("CLag: warn_radius "+CLagTileEntityTicker.warn_radius);
+		
 			FMLLog.info("CLag: timesum_min_slowA "+CLagTileEntityTicker.timesum_min_slowA);
 			FMLLog.info("CLag: timesum_min_slowB "+CLagTileEntityTicker.timesum_min_slowB);
 			FMLLog.info("CLag: timesum_min_slowC "+CLagTileEntityTicker.timesum_min_slowC);

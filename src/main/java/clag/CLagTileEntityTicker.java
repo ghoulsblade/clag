@@ -2,26 +2,31 @@
 
 package clag;
 
-import cpw.mods.fml.common.FMLLog;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.ForgeDummyContainer;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import cpw.mods.fml.common.FMLLog;
 
 // based on https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
 public class CLagTileEntityTicker {
     public static CLagTileEntityTicker instance = new CLagTileEntityTicker();
     boolean bIsProfiling = false;
-    public static int profile_interval = 10*20; // every x*20 seconds
+    boolean bIsWarning = false;
+    public static int profile_interval = 10*20; // ticks, 10*20 = 10 seconds
+    public static int warn_interval = 10*60*20; // ticks, 5*60*20 = 5 minutes
+    public static int last_warn_tick = Integer.MIN_VALUE;
     public int cur_ticknum = 0;
 
     public static final long TIMESUM_MICRO = 1000*1; // System.nanoTime -> nano*1000 = micro, micro*1000 = milli
@@ -31,12 +36,27 @@ public class CLagTileEntityTicker {
     public static long timesum_min_slowA = TIMESUM_TICK/100;
     public static long timesum_min_slowB = TIMESUM_TICK/50;
     public static long timesum_min_slowC = TIMESUM_TICK/20;
+    public static long timesum_warn = 0;
     // public long timesum_min_slow = 10;
+    public static int warn_radius = 16*8; // in tiles/blocks, chunk=16
+    public static String warn_text = "Warning! a chunk near you is causing lag, so time was slowed there.";
 
     public static int slow_down_factorA = 4;
     public static int slow_down_factorB = 10;
     public static int slow_down_factorC = 20;
+    
 
+    public HashSet<ChunkInfo> warnset = new HashSet<ChunkInfo>(); //HashSet instance without any element
+
+    // ----------------------------- constructor
+    
+    public CLagTileEntityTicker ()
+    {
+
+    }
+
+    // ----------------------------- utils
+    
     public int getSlowFactor (ChunkInfo o)
     {
         if (o.iTimeSum >= timesum_min_slowC) return slow_down_factorC;
@@ -45,31 +65,70 @@ public class CLagTileEntityTicker {
         return 1;
     }
     
-    public CLagTileEntityTicker ()
+    // ----------------------------- warn
+    
+    public void warnStartTick ()
     {
-
+    	// warn time
+    	timesum_warn = timesum_min_slowA;
+    	if (timesum_warn > timesum_min_slowB) timesum_warn = timesum_min_slowB;
+    	if (timesum_warn > timesum_min_slowC) timesum_warn = timesum_min_slowC;
+    	warnset.clear();
     }
+    
+    public void warnEndTick ()
+    {
+		for (ChunkInfo o : warnset) {
+			warnNearestPlayer(o);
+		}
+    }
+    
+    public void warnNearestPlayer (ChunkInfo o)
+    {
+    	EntityPlayerMP p = CLagUtils.findNearestPlayer(o.pos.dim,o.pos.cx,o.pos.cz,warn_radius);
+    	if (p == null) return;
+    	String txt = warn_text;
+    	txt += " "+(o.pos.cx*16+8)+","+(o.pos.cz*16+8);
+    	CLagUtils.sendChat(p,txt);
+    }
+    
+    // ----------------------------- tick
 
     public void StartTick (int iTickNum) {
         cur_ticknum = iTickNum;
         bIsProfiling = (iTickNum % profile_interval) == 0;
+        bIsWarning = false;
         if (bIsProfiling) 
         {
         	worst_chunk_time = 0;
         	FMLLog.info("CLagTileEntityTicker:StartTick profile "+iTickNum);
+        	
+        	// warning nearby players
+        	if (iTickNum >= last_warn_tick + warn_interval)
+        	{
+        		last_warn_tick = iTickNum;
+        		bIsWarning = true;
+            	FMLLog.info("CLagTileEntityTicker:StartTick warning=true");
+        		warnStartTick();
+        	}
         }
 
         lastchunk_dim = Integer.MAX_VALUE; // make sure cur_ticknum check (sum reset) is done for last used chunk as well
         ChunkSkipStartTick();
     }
+    
     public void EndTick (int iTickNum) {
         if (bIsProfiling) 
         {
+        	if (bIsWarning) warnEndTick();
         	updateWorst();
         	FMLLog.info("CLagTileEntityTicker:EndTick profile "+iTickNum+",worst_chunk_time="+worst_chunk_time);
         }
     }
 
+
+    // ----------------------------- loop
+    
     public void runTileEntities(World world, ArrayList<TileEntity> toTick) {
         IChunkProvider chunkProvider = world.getChunkProvider();
         Iterator<TileEntity> iterator = toTick.iterator();
@@ -159,11 +218,13 @@ public class CLagTileEntityTicker {
         public int worst_x;
         public int worst_y;
         public int worst_z;
-        public ChunkInfo ()
+        public ChunkInfoPos pos;
+        public ChunkInfo (ChunkInfoPos _pos)
         {
             ticknum = 0;
             iTimeSum = 0;
             worst_time = 0;
+            pos = _pos;
         }
     }
 
@@ -176,7 +237,7 @@ public class CLagTileEntityTicker {
         ChunkInfo o = mChunkInfo.get(coord);
         if (o == null)
         {
-            o = new ChunkInfo();
+            o = new ChunkInfo(coord);
             mChunkInfo.put(coord, o);
         }
         return o;
@@ -243,13 +304,17 @@ public class CLagTileEntityTicker {
     private void profileAddChunkTime(int dim,int cx,int cz, int x, int y, int z, long dt) {
         if (lastchunk_dim != dim || lastchunk_cx != cx || lastchunk_cz != cz)
         {
-            if (lastchunkinfo != null &&
-                worst_chunk_time < lastchunkinfo.iTimeSum)
-            {
-                worst_chunk_time = lastchunkinfo.iTimeSum;
-                worst_chunk_dim = lastchunk_dim;
-                worst_chunk_cx = lastchunk_cx;
-                worst_chunk_cz = lastchunk_cz;
+        	if (lastchunkinfo != null) 
+        	{
+	            if (worst_chunk_time < lastchunkinfo.iTimeSum)
+	            {
+	                worst_chunk_time = lastchunkinfo.iTimeSum;
+	                worst_chunk_dim = lastchunk_dim;
+	                worst_chunk_cx = lastchunk_cx;
+	                worst_chunk_cz = lastchunk_cz;
+	            }
+                
+                if (bIsWarning && lastchunkinfo.iTimeSum >= timesum_warn) warnset.add(lastchunkinfo);
             }
             lastchunk_dim = dim;
             lastchunk_cx = cx;

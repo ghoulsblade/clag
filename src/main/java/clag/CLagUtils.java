@@ -3,9 +3,11 @@ package clag;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatMessageComponent;
@@ -68,7 +70,7 @@ public class CLagUtils {
         return listFields.toArray(new Field[listFields.size()]);
     }
     
-    
+    // NOTE: see also CommandBase.notifyAdmins(...)
     // threaded chat to avoid lockup in case something hangs
     public static void sendChat (EntityPlayerMP p,String txt,EnumChatFormatting fmt)
     {
@@ -88,6 +90,33 @@ public class CLagUtils {
     public static void sendChat (EntityPlayerMP p,String txt)
     {
     	sendChat(p,txt,EnumChatFormatting.YELLOW);
+    }
+    
+    public static EntityPlayerMP findNearestPlayer (int dim,int cx,int cz,double max_radius)
+    {
+		World world = DimensionManager.getWorld(dim);
+		if (world == null) return null;
+        Iterator iterator = world.playerEntities.iterator();
+        
+        EntityPlayerMP f_p = null;
+        double f_d = max_radius;
+        double mx = cx*16 + 8;
+        double mz = cz*16 + 8;
+
+        while (iterator.hasNext())
+        {
+        	EntityPlayerMP p = (EntityPlayerMP)iterator.next();
+            double dx = p.posX - mx;
+            double dz = p.posZ - mz;
+            double d = dx*dx + dz*dz;
+            
+            if (d <= f_d)
+            {
+            	f_d = d;
+            	f_p = p;
+            }
+        }
+    	return f_p;
     }
     
 }
