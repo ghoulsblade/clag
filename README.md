@@ -11,6 +11,7 @@ and in laggy chunks time is slowed down by skipping ticks for tile-entities.
 That way the players causing lag are punished by getting their machines slowed down,
 and the rest of the server can run at full speed.
 Players near laggy chunks regularly get a chat message informing them of the slowdown and the coords of the worst tile-entity to help them fix it.
+The measurement is repeated regularly (every 30 sec by default), and if the chunk stopped causing lag, it is no longer slowed down.
 
 tech: similar to tickprofiler and tickthreading, we replace World.loadedTileEntity by our own class that overides iteration behavior.
 That way we do not need to actually modify vanilla code, so we do not need to make this a core-mod.
