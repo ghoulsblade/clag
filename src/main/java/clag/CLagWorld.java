@@ -2,26 +2,6 @@
 
 package clag;
 
-import cpw.mods.fml.common.FMLLog;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.entity.Entity;
-import net.minecraft.logging.ILogAgent;
-import net.minecraft.profiler.Profiler;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ReportedException;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.storage.ISaveHandler;
-import net.minecraftforge.common.ForgeDummyContainer;
-
-import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.List;
-
-
 /**
  * Created by ghoul on 18.02.14.
  */
@@ -51,9 +31,9 @@ public class CLagWorld { //extends WorldServer
     }
 */
 
-    /**
-     * Updates (and cleans up) entities and tile entities
-     */
+	/**
+	 * Updates (and cleans up) entities and tile entities
+	 */
 /*
     @Override
     public void updateEntities()
