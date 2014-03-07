@@ -24,7 +24,7 @@ public class CLagTileEntityTicker {
     public static CLagTileEntityTicker instance = new CLagTileEntityTicker();
     boolean bIsProfiling = false;
     boolean bIsWarning = false;
-    public static int profile_interval = 10*20; // ticks, 10*20 = 10 seconds
+    public static int profile_interval = 30*20; // ticks, 10*20 = 10 seconds
     public static int warn_interval = 10*60*20; // ticks, 5*60*20 = 5 minutes
     public static int last_warn_tick = Integer.MIN_VALUE;
     public int cur_ticknum = 0;
@@ -38,7 +38,7 @@ public class CLagTileEntityTicker {
     public static long timesum_min_slowC = TIMESUM_TICK/20;
     public static long timesum_warn = 0;
     // public long timesum_min_slow = 10;
-    public static int warn_radius = 16*8; // in tiles/blocks, chunk=16
+    public static int warn_radius = 16*4; // in tiles/blocks, chunk=16
     public static String warn_text = "Warning! a chunk near you is causing lag, so time was slowed there.";
 
     public static int slow_down_factorA = 4;
@@ -46,7 +46,7 @@ public class CLagTileEntityTicker {
     public static int slow_down_factorC = 20;
     
     public static int max_warn_number_of_players = 20;
-
+    
 
     public HashSet<ChunkInfo> warnset = new HashSet<ChunkInfo>(); //HashSet instance without any element
 
