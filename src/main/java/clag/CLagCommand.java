@@ -62,7 +62,11 @@ public class CLagCommand extends CommandBase {
 				until_tick = CLagTileEntityTicker.instance.cur_ticknum + parseIntWithMin(sender, par2ArrayOfStr[1], 0);
 
 			CLagTileEntityTicker.ChunkInfo o = CLagTileEntityTicker.instance.getChunkInfoAtPlayer(p);
-			if ( o != null ) o.force_slow_until_tick = until_tick;
+			if ( o != null ) 
+			{
+				o.force_slow_until_tick = until_tick;
+				CLagUtils.chatMessage(sender, "chunk slowed: "+(o.pos.cx*16)+","+(o.pos.cz*16));
+			}
 		} else if ( sub.equals("warn") ) // force-slow the chunk the player is currently standing in
 		{
 			CLagTileEntityTicker.instance.last_warn_tick = Integer.MIN_VALUE;
