@@ -3,22 +3,24 @@
 
 == 2014-03-07 clag test notes 
 
-* option to dump to file coords of online players ->  chat-command for test server to create chunkloaders at those positions
-* tile loop : sum by type during profile tick -> dump to file how many of each type were ticked
-* count exceptions in tileloop by tile type
-* count calls of arraylist stub calls
-* partial code - option to add empty arraylist-stub that leaves vanilla tick intact
-* partial code - option to add tile loop with just vanilla code for tick
-* option to NOT skip ticks for certain tile types -> applied energistics tile
-* when clag is stopped, adjust output of commands to say so
-* replace "arraylist.isProfiling()" by constant
-* option to just start+stop at profile -> only warning
-* print warning to all nearby players, check why it was printed twice
-* measure time for profile tick and print in worst-command and console
-* option to require prem level 2 for admin commands
-* clag worst : show coords of worst chunk
-* clag tpworst : tp there
-* clag stats : list number of exceptions etc in chat
+* DONE: option to dump to file coords of online players ->  chat-command for test server to create chunkloaders at those positions
+* DONE: count exceptions in tileloop, last coords + tile type
+* DONE: partial code - option to add empty arraylist-stub that leaves vanilla tick intact
+* DONE: partial code - option to add tile loop with just vanilla code for tick
+* DONE: blacklist : option to NOT skip ticks for certain tile types -> applied energistics tile
+* DONE: when clag is stopped, adjust output of commands to say so
+* DONE: replace "arraylist.isProfiling()" by constant
+* DONE: option to just start+stop at profile -> only warning
+* DONE: measure time for profile tick and print in worst-command and console
+* DONE: clag worst : show coords of worst chunk
+* DONE: clag stats : list number of exceptions etc in chat
+* DONE: last exception coords + type
+
+* LATER: tile loop : sum by type during profile tick -> dump to file how many of each type were ticked
+* LATER: count calls of arraylist stub calls
+* LATER: print warning to all nearby players, check why it was printed twice
+* LATER: option to require prem level 2 for admin commands
+* LATER: clag tpworst : tp there
 
 == 2014-03-07 clag live test -> slow
 

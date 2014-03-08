@@ -41,11 +41,6 @@ public abstract class EntityList<T> extends ArrayList<T> {
 		}
 	}
 
-	public boolean isProfiling() {
-		//EntityTickProfiler.profilingState != ProfileCommand.ProfilingState.NONE
-		return true;
-	}
-
     /*
     // see https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/util/contextaccess/ContextAccessSecurityManager.java
     public Class getContext(int depth) {
@@ -78,7 +73,7 @@ public abstract class EntityList<T> extends ArrayList<T> {
 
 	@Override
 	public int size() {
-		boolean tick = isProfiling() && World.class.isAssignableFrom(contextAccess.getContext(1));
+		boolean tick = CLagTileEntityTicker.instance.bTickOverride && World.class.isAssignableFrom(contextAccess.getContext(1));
 		if ( tick ) {
 			Class secondCaller = contextAccess.getContext(2);
 			if ( secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller) ) {
@@ -199,7 +194,7 @@ public abstract class EntityList<T> extends ArrayList<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		boolean tick = isProfiling() && World.class.isAssignableFrom(contextAccess.getContext(1));
+		boolean tick = CLagTileEntityTicker.instance.bTickOverride && World.class.isAssignableFrom(contextAccess.getContext(1));
 		if ( tick ) {
 			Class secondCaller = contextAccess.getContext(2);
 			if ( secondCaller == MinecraftServer.class || World.class.isAssignableFrom(secondCaller) ) {

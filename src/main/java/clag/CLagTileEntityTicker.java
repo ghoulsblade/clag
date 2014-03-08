@@ -3,6 +3,7 @@
 package clag;
 
 import cpw.mods.fml.common.FMLLog;
+import net.minecraft.block.Block;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -12,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraftforge.common.ForgeDummyContainer;
+import net.minecraftforge.liquids.IBlockLiquid.BlockType;
 
 import java.util.*;
 
@@ -38,13 +40,29 @@ public class CLagTileEntityTicker {
 	public static String warn_text = "Warning! a chunk near you is causing lag, so time was slowed there.";
 
 	public static int slow_down_factorA = 4;
-	public static int slow_down_factorB = 10;
-	public static int slow_down_factorC = 20;
+	public static int slow_down_factorB = 16;
+	public static int slow_down_factorC = 64;
 
-	public static int max_warn_number_of_players = 20;
+	public static int max_warn_number_of_players = 40;
 
+	public static long last_profile_tick_start = 0;
+	public static long last_profile_tick_duration = 0;
+	public static boolean bTickOverride = true;
 
-	public HashSet<ChunkInfo> warnset = new HashSet<ChunkInfo>(); //HashSet instance without any element
+	public static int c_exc = 0;
+	public static int last_exc_dim = Integer.MAX_VALUE;
+	public static int last_exc_x = 0;
+	public static int last_exc_y = 0;
+	public static int last_exc_z = 0;
+	public static int last_exc_type = 0;
+
+	public static boolean bEnableBlacklist = false;
+	public static boolean bEnableSlowing = true;
+	public static boolean bForceVanillaTick = false;
+	
+
+	public static boolean bHookJustForProfileTick = true;
+
 
 	// ----------------------------- constructor
 
@@ -62,8 +80,26 @@ public class CLagTileEntityTicker {
 		return 1;
 	}
 
+	// ----------------------------- blacklist
+	
+	public HashSet<Integer> blacklist = new HashSet<Integer>();
+
+	public void BlackListAdd (int t)
+	{
+		bEnableBlacklist = true;
+		blacklist.add(t);
+	}
+	
+	public boolean canSkipType (int t)
+	{
+		if (!bEnableBlacklist) return true;
+		return !blacklist.contains(t);
+	}
+	
 	// ----------------------------- warn
 
+	public HashSet<ChunkInfo> warnset = new HashSet<ChunkInfo>();
+	
 	public void warnStartTick() {
 		// warn time
 		timesum_warn = timesum_min_slowA;
@@ -75,7 +111,8 @@ public class CLagTileEntityTicker {
 	public void warnEndTick() {
 		int c = 0;
 		for ( ChunkInfo o : warnset ) {
-			c += warnNearestPlayer(o);
+			//c += warnNearestPlayer(o);
+			c += warnAllNearbyPlayers(o,max_warn_number_of_players - c);
 			if ( c >= max_warn_number_of_players ) break; // sanity check
 		}
 	}
@@ -84,10 +121,16 @@ public class CLagTileEntityTicker {
 		EntityPlayerMP p = CLagUtils.findNearestPlayer(o.pos.dim, o.pos.cx, o.pos.cz, warn_radius);
 		if ( p == null ) return 0;
 		String txt = warn_text;
-		txt += " " + (o.pos.cx * 16 + 8) + "," + (o.pos.cz * 16 + 8);
-		txt += " : " + o.worst_x + "," + o.worst_y + "," + o.worst_z;
+		//txt += " " + (o.pos.cx * 16 + 8) + "," + (o.pos.cz * 16 + 8);
+		txt += " worst= " + o.worst_x + "," + o.worst_y + "," + o.worst_z;
 		CLagUtils.sendChat(p, txt);
 		return 1;
+	}
+
+	public int warnAllNearbyPlayers(ChunkInfo o,int maxnum) {
+		String txt = warn_text;
+		txt += " worst= " + o.worst_x + "," + o.worst_y + "," + o.worst_z;
+		return CLagUtils.chatAllNearbyPlayers(o.pos.dim, o.pos.cx, o.pos.cz, warn_radius, txt, maxnum);
 	}
 
 	// ----------------------------- tick
@@ -98,7 +141,10 @@ public class CLagTileEntityTicker {
 		bIsWarning = false;
 		if ( bIsProfiling ) {
 			worst_chunk_time = 0;
+			worst_chunk_info = null;
 			CLagUtils.debug("CLagTileEntityTicker:StartTick profile " + iTickNum);
+
+			last_profile_tick_start = System.nanoTime();
 
 			// warning nearby players
 			if ( iTickNum >= last_warn_tick + warn_interval ) {
@@ -107,6 +153,9 @@ public class CLagTileEntityTicker {
 				CLagUtils.debug("CLagTileEntityTicker:StartTick warning=true");
 				warnStartTick();
 			}
+			
+			// enable hook
+			if (bHookJustForProfileTick) CLag.instance.startCLag();
 		}
 
 		lastchunk_dim = Integer.MAX_VALUE; // make sure cur_ticknum check (sum reset) is done for last used chunk as well
@@ -115,9 +164,15 @@ public class CLagTileEntityTicker {
 
 	public void EndTick(int iTickNum) {
 		if ( bIsProfiling ) {
-			if ( bIsWarning ) warnEndTick();
 			updateWorst();
-			CLagUtils.debug("CLagTileEntityTicker:EndTick profile " + iTickNum + ",worst_chunk_time=" + worst_chunk_time);
+			if ( bIsWarning ) warnEndTick();
+
+			long dt = System.nanoTime() - last_profile_tick_start;
+			last_profile_tick_duration = dt;
+			CLagUtils.debug("CLagTileEntityTicker:EndTick profile " + iTickNum + " tickdur="+dt+",worst_chunk_time=" + worst_chunk_time);
+
+			// disable hook
+			if (bHookJustForProfileTick) CLag.instance.stopCLag();
 		}
 	}
 
@@ -125,6 +180,8 @@ public class CLagTileEntityTicker {
 	// ----------------------------- loop
 
 	public void runTileEntities(World world, ArrayList<TileEntity> toTick) {
+		if (bForceVanillaTick) { runTileEntitiesVanilla(world,toTick); return; }
+		
 		IChunkProvider chunkProvider = world.getChunkProvider();
 		Iterator<TileEntity> iterator = toTick.iterator();
 		long end = System.nanoTime();
@@ -140,7 +197,7 @@ public class CLagTileEntityTicker {
 			int cx = x >> 4;
 			int cz = z >> 4;
 
-			if ( isChunkSkippedNow(dim, cx, cz) ) continue;
+			if ( bEnableSlowing && !bIsProfiling && isChunkSkippedNow(dim, cx, cz) && canSkipType(tileEntity.blockType.blockID) ) continue;
 
 			if ( !tileEntity.isInvalid() && tileEntity.hasWorldObj() && chunkProvider.chunkExists(cx, cz) ) {
 				try {
@@ -154,6 +211,18 @@ public class CLagTileEntityTicker {
 						tileEntity.invalidate();
 						world.setBlockToAir(x, tileEntity.yCoord, z);
 					} else {
+						++c_exc;
+						last_exc_dim = dim;
+						last_exc_x = x;
+						last_exc_y = tileEntity.yCoord;
+						last_exc_z = z;
+						last_exc_type = tileEntity.blockType.blockID;
+
+						// print coords and type
+						int t = last_exc_type;
+						String tn = tileEntity.blockType.getUnlocalizedName();
+						CLagUtils.debug(String.format("clag tile exception: dim=%d %d,%d,%d type=%d=%s",c_exc,last_exc_dim,last_exc_x,last_exc_y,last_exc_z,t,tn));
+
 						throw new ReportedException(crashReport);
 					}
 				}
@@ -178,6 +247,65 @@ public class CLagTileEntityTicker {
 			}
 		}
 	}
+	
+	// ----------------------------- loop-vanilla (for testing only)
+
+	public void runTileEntitiesVanilla (World world, ArrayList<TileEntity> toTick) {
+		IChunkProvider chunkProvider = world.getChunkProvider();
+		Iterator<TileEntity> iterator = toTick.iterator();
+		int dim = world.provider.dimensionId;
+
+		while ( iterator.hasNext() ) {
+			TileEntity tileEntity = iterator.next();
+
+			int x = tileEntity.xCoord;
+			int z = tileEntity.zCoord;
+			int cx = x >> 4;
+			int cz = z >> 4;
+
+			if ( !tileEntity.isInvalid() && tileEntity.hasWorldObj() && chunkProvider.chunkExists(cx, cz) ) {
+				try {
+					tileEntity.updateEntity();
+				} catch ( Throwable var6 ) {
+					CrashReport crashReport = CrashReport.makeCrashReport(var6, "Ticking tile entity");
+					CrashReportCategory crashReportCategory = crashReport.makeCategory("Tile entity being ticked");
+					tileEntity.func_85027_a(crashReportCategory);
+					if ( ForgeDummyContainer.removeErroringTileEntities ) {
+						FMLLog.severe(crashReport.getCompleteReport());
+						tileEntity.invalidate();
+						world.setBlockToAir(x, tileEntity.yCoord, z);
+					} else {
+						++c_exc;
+						last_exc_dim = dim;
+						last_exc_x = x;
+						last_exc_y = tileEntity.yCoord;
+						last_exc_z = z;
+						last_exc_type = tileEntity.blockType.blockID;
+
+						// print coords and type
+						int t = last_exc_type;
+						String tn = tileEntity.blockType.getUnlocalizedName();
+						CLagUtils.debug(String.format("clag tile exception: dim=%d %d,%d,%d type=%d=%s",c_exc,last_exc_dim,last_exc_x,last_exc_y,last_exc_z,t,tn));
+
+						throw new ReportedException(crashReport);
+					}
+				}
+			}
+
+			if ( tileEntity.isInvalid() ) {
+				iterator.remove();
+
+				if ( chunkProvider.chunkExists(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4) ) {
+					Chunk chunk = world.getChunkFromChunkCoords(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4);
+
+					if ( chunk != null ) {
+						chunk.cleanChunkBlockTileEntity(tileEntity.xCoord & 15, tileEntity.yCoord, tileEntity.zCoord & 15);
+					}
+				}
+			}
+		}
+	}
+	
 
 	// ---------- ChunkInfo
 
@@ -283,17 +411,13 @@ public class CLagTileEntityTicker {
 	private int lastchunk_cz = Integer.MAX_VALUE;
 	private ChunkInfo lastchunkinfo = null;
 	public long worst_chunk_time = 0;
-	public long worst_chunk_dim = 0;
-	public long worst_chunk_cx = 0;
-	public long worst_chunk_cz = 0;
+	public ChunkInfo worst_chunk_info = null;
 
 	private void updateWorst() {
 		if ( lastchunkinfo != null &&
-				worst_chunk_time < lastchunkinfo.iTimeSum ) {
+			 worst_chunk_time < lastchunkinfo.iTimeSum ) {
 			worst_chunk_time = lastchunkinfo.iTimeSum;
-			worst_chunk_dim = lastchunk_dim;
-			worst_chunk_cx = lastchunk_cx;
-			worst_chunk_cz = lastchunk_cz;
+			worst_chunk_info = lastchunkinfo;
 		}
 	}
 
@@ -303,9 +427,7 @@ public class CLagTileEntityTicker {
 			if ( lastchunkinfo != null ) {
 				if ( worst_chunk_time < lastchunkinfo.iTimeSum ) {
 					worst_chunk_time = lastchunkinfo.iTimeSum;
-					worst_chunk_dim = lastchunk_dim;
-					worst_chunk_cx = lastchunk_cx;
-					worst_chunk_cz = lastchunk_cz;
+					worst_chunk_info = lastchunkinfo;
 				}
 
 				if ( bIsWarning && lastchunkinfo.iTimeSum >= timesum_warn ) warnset.add(lastchunkinfo);

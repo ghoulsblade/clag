@@ -128,6 +128,29 @@ public class CLagUtils {
 		return f_p;
 	}
 
+	public static int chatAllNearbyPlayers(int dim, int cx, int cz, double max_radius, String txt, int maxnum) {
+		World world = DimensionManager.getWorld(dim);
+		if ( world == null ) return 0;
+		Iterator iterator = world.playerEntities.iterator();
+		int c = 0;
+
+		double f_d = max_radius * max_radius;
+		double mx = cx * 16 + 8;
+		double mz = cz * 16 + 8;
+
+		while ( iterator.hasNext() ) {
+			EntityPlayerMP p = (EntityPlayerMP) iterator.next();
+			double dx = p.posX - mx;
+			double dz = p.posZ - mz;
+			if ( dx * dx + dz * dz <= f_d ) {
+				CLagUtils.sendChat(p, txt);
+				if (++c >= maxnum) return c;
+			}
+		}
+		return c;
+	}
+	
+
 	public static void debug(String message) {
 		if ( CLag.debug ) {
 			FMLLog.info(message);

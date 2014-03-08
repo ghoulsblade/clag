@@ -35,8 +35,9 @@ public class CLag {
 	public static CommonProxy proxy;
 
 	public File configfile;
-	public static boolean debug;
-
+	public static boolean debug = true;
+	public static boolean autostart = true;
+	
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		CLagUtils.debug("CLag: serverStarting 01");
@@ -47,8 +48,11 @@ public class CLag {
 		CLagUtils.debug("CLag: serverStarting 03");
 
 		// autostart
-		CLagUtils.debug("CLag: autostarting profiling+slowing...");
-		startCLag();
+		if (autostart && !CLagTileEntityTicker.instance.bHookJustForProfileTick)
+		{
+			CLagUtils.debug("CLag: autostarting profiling+slowing...");
+			startCLag();
+		}
 	}
 
 	@EventHandler // used in 1.6.2
@@ -75,9 +79,14 @@ public class CLag {
 		config.load();
 
 		FMLLog.info("CLag: loadConfig02");
+		
+		CLagTileEntityTicker g = CLagTileEntityTicker.instance;
 
 		String cat = Configuration.CATEGORY_GENERAL;
-		debug = config.get(cat, "debug", true).getBoolean(true);
+		debug = config.get(cat, "debug", debug).getBoolean(debug);
+		autostart = config.get(cat, "autostart", autostart).getBoolean(autostart);
+		g.bHookJustForProfileTick = config.get(cat, "bHookJustForProfileTick", g.bHookJustForProfileTick).getBoolean(g.bHookJustForProfileTick);
+		
 		CLagTileEntityTicker.profile_interval = config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
 		CLagTileEntityTicker.warn_interval = config.get(cat, "warn_interval", CLagTileEntityTicker.warn_interval).getInt();
 		CLagTileEntityTicker.warn_radius = config.get(cat, "warn_radius", CLagTileEntityTicker.warn_radius).getInt();
