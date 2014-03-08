@@ -32,7 +32,7 @@ chat commands
 ====
 
 * /clag-info : for players, shows information about the current chunk
-* /clag [subcmd] : admin only
+* /clag [subcommand] : admin only
 * /clag minslow [A] [B] [C] : set time-per-chunk thresholds, in nanoseconds, A=x4 B=x10 C=x20 by default
 * /clag worst : list coords and time of worst chunk
 * /clag reload : reload config file
@@ -42,6 +42,12 @@ chat commands
 * /clag stop : uinstall hook, disables clag-profiling and slowing. allows use of tickprofiler-mod
 * /clag start : reinstall hook
 
+permissions
+=== 
+
+in MCPC, all commands are assigned a permission node base off the classpath to the command class.  
+* clag.CLagCommandInfo = for players, so they can do /clag-info
+* clag.CLagCommand = for admins, access /clag [subcommand]
 
 ideas
 ====

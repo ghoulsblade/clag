@@ -1,6 +1,73 @@
 // clag = chunklag, localize lag to the chunks causing it by slowing down time inside laggy chunks.
 * reflection docs : http://docs.oracle.com/javase/tutorial/reflect/index.html
 
+== 2014-03-07 clag test notes 
+
+* option to dump to file coords of online players ->  chat-command for test server to create chunkloaders at those positions
+* tile loop : sum by type during profile tick -> dump to file how many of each type were ticked
+* count exceptions in tileloop by tile type
+* count calls of arraylist stub calls
+* partial code - option to add empty arraylist-stub that leaves vanilla tick intact
+* partial code - option to add tile loop with just vanilla code for tick
+* option to NOT skip ticks for certain tile types -> applied energistics tile
+* when clag is stopped, adjust output of commands to say so
+* replace "arraylist.isProfiling()" by constant
+* option to just start+stop at profile -> only warning
+* print warning to all nearby players, check why it was printed twice
+* measure time for profile tick and print in worst-command and console
+* option to require prem level 2 for admin commands
+* clag worst : show coords of worst chunk
+* clag tpworst : tp there
+* clag stats : list number of exceptions etc in chat
+
+== 2014-03-07 clag live test -> slow
+
+C:\game\minecraft\mymod\archiv\2014-03-08-darius-code-nN1jhMNc.txt
+public synchronized void updateTileEntity()  { ...
+/* 1302 */         for (TileRef m : this.AllMachines) {
+/*      */           try
+/*      */           {
+/* 1305 */             ((IGridMachine)m.getTile()).setNetworkReady(true);			!!!!!!!!
+/*      */           } catch (AppEngTileMissingException e) {
+/* 1307 */             e.printStackTrace();
+/*      */           }
+/*      */         }
+
+
+coords ???
+2014-03-07 17:24:42 [SEVERE] appeng.api.exceptions.AppEngTileMissingException
+2014-03-07 17:24:42 [SEVERE] 	at appeng.api.TileRef.getTile(TileRef.java:49)
+2014-03-07 17:24:42 [SEVERE] 	at appeng.me.tile.TileController.updateTileEntity(TileController.java:1305)			
+2014-03-07 17:24:42 [SEVERE] 	at appeng.common.base.AppEngTile.func_70316_g(AppEngTile.java:713)				 	// func_70316_g = updateTileEntity
+2014-03-07 17:24:42 [SEVERE] 	at clag.CLagTileEntityTicker.runTileEntities(CLagTileEntityTicker.java:147)			// tileEntity.updateEntity();
+2014-03-07 17:24:42 [SEVERE] 	at clag.LoadedTileEntityList.tick(LoadedTileEntityList.java:18)
+2014-03-07 17:24:42 [SEVERE] 	at clag.EntityList.doTick(EntityList.java:94)
+2014-03-07 17:24:42 [SEVERE] 	at clag.EntityList.iterator(EntityList.java:206)
+2014-03-07 17:24:42 [SEVERE] 	at net.minecraft.world.World.func_72939_s(World.java:2749)
+2014-03-07 17:24:42 [SEVERE] 	at net.minecraft.server.MinecraftServer.func_71190_q(MinecraftServer.java:883)
+2014-03-07 17:24:42 [SEVERE] 	at net.minecraft.server.dedicated.DedicatedServer.func_71190_q(DedicatedServer.java:330)
+2014-03-07 17:24:42 [SEVERE] 	at net.minecraft.server.MinecraftServer.func_71217_p(MinecraftServer.java:777)
+2014-03-07 17:24:42 [SEVERE] 	at net.minecraft.server.MinecraftServer.run(MinecraftServer.java:659)
+2014-03-07 17:24:42 [SEVERE] 	at net.minecraft.server.ThreadMinecraftServer.run(ThreadMinecraftServer.java:16)
+
+https://github.com/nallar/TickThreading/blob/master/resources/patches.xml#L1501
+
+
+== permissions
+
+in MCPC, all commands are assigned a permission node base off the classpath to the command class.  
+For example  you would use clag.CLagCommand in a permission node to have access to that comand
+
+sjphone : permissionnodes
+http://wiki.ess3.net/wiki/Group_Manager
+https://github.com/nallar/TickProfiler/tree/47631d5f2145d77d07545861e342ba361ec220e3/src/common/ru/tehkode/permissions
+https://github.com/nallar/TickProfiler/blob/f88aa64e1db0c944aa65a48339beb709d1cbf896/src/common/me/nallar/tickprofiler/minecraft/commands/Command.java
+
+== tickprofiler : profiling in separate thread ?
+
+https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
+nope, just start(); thread{ sleep(); sync{ stop(); callback();}}
+
 == tileentity sleep
 public void TileEntity.updateEntity() {}
 public void World.updateEntities()
