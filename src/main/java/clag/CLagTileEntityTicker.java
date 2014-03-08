@@ -84,10 +84,17 @@ public class CLagTileEntityTicker {
 	
 	public HashSet<Integer> blacklist = new HashSet<Integer>();
 
+	public void BlackListClear ()
+	{
+		blacklist.clear();
+		CLagUtils.debug("CLagTileEntityTicker: BlackListClear ");
+	}
+	
 	public void BlackListAdd (int t)
 	{
 		bEnableBlacklist = true;
 		blacklist.add(t);
+		CLagUtils.debug("CLagTileEntityTicker: BlackListAdd " + t);
 	}
 	
 	public boolean canSkipType (int t)

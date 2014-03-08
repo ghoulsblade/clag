@@ -5,7 +5,7 @@ serverside minecraft mod to slow down time in chunks causing lag
 
 download
 ====
-[CLag-0.0.2.jar](releases/CLag-0.0.2.jar?raw=true)
+[CLag-0.0.3.jar](releases/CLag-0.0.3.jar?raw=true)
 
 about
 ====

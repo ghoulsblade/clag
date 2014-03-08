@@ -137,8 +137,14 @@ public class CLagCommand extends CommandBase {
 			
 		} else if ( sub.equals("blacklist") )
 		{
-			int t = parseIntWithMin(sender, par2ArrayOfStr[1], 0);
-			g.BlackListAdd(t);
+			if (par2ArrayOfStr.length >= 2)
+			{
+				int t = parseIntWithMin(sender, par2ArrayOfStr[1], 0);
+				g.BlackListAdd(t);
+			} else
+			{
+				g.BlackListClear();
+			}
 			
 		} else if ( sub.equals("reset") ) // reset some vars
 		{

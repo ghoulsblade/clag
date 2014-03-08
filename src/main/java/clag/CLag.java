@@ -102,6 +102,9 @@ public class CLag {
 		CLagTileEntityTicker.slow_down_factorB = config.get(cat, "slow_down_factorB", "" + CLagTileEntityTicker.slow_down_factorB).getInt();
 		CLagTileEntityTicker.slow_down_factorC = config.get(cat, "slow_down_factorC", "" + CLagTileEntityTicker.slow_down_factorC).getInt();
 
+		int[] arr = config.get(cat, "blacklist", new int[] {}).getIntList();
+		g.BlackListClear();
+		for (int i=0;i<arr.length;++i) g.BlackListAdd(arr[i]);
 
 		CLagUtils.debug("CLag: profile_interval " + CLagTileEntityTicker.profile_interval);
 		CLagUtils.debug("CLag: warn_interval " + CLagTileEntityTicker.warn_interval);

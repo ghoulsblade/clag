@@ -1,7 +1,9 @@
 // clag = chunklag, localize lag to the chunks causing it by slowing down time inside laggy chunks.
 * reflection docs : http://docs.oracle.com/javase/tutorial/reflect/index.html
 
-== 2014-03-07 clag test notes 
+* binary : by doing "gradlew.bat build" in command prompt at the project root
+
+== 2014-03-08 clag test notes 
 
 * DONE: option to dump to file coords of online players ->  chat-command for test server to create chunkloaders at those positions
 * DONE: count exceptions in tileloop, last coords + tile type
@@ -22,6 +24,14 @@
 * LATER: option to require prem level 2 for admin commands
 * LATER: clag tpworst : tp there
 
+== 2014-03-08 blacklist example
+
+    I:blacklist <
+        62
+        63
+        64
+     >
+	 
 == 2014-03-07 clag live test -> slow
 
 C:\game\minecraft\mymod\archiv\2014-03-08-darius-code-nN1jhMNc.txt
