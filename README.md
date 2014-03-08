@@ -41,6 +41,17 @@ chat commands
 * /clag warn : reset warning interval, player warnings will be sent on next profile tick
 * /clag stop : uinstall hook, disables clag-profiling and slowing. allows use of tickprofiler-mod
 * /clag start : reinstall hook
+* /clag enable_tick : default = 1, 0 to disable custom tick code entirely
+* /clag enable_slow : default = 1, 0 to disable the tick-skipping entirely
+* /clag force_vanilla : default = 0, 1 to use vanilla tick code without any if-checks
+* /clag profile_only : 1 = warnings only, no slowing possible, the hook is installed only during a profile tick
+* /clag debug : print some debug vars
+* /clag blacklist : clear blacklist
+* /clag blacklist [blockid] : add blockid to blacklist, blacklisted ids will never be slowed
+* /clag reset : reset some counter vars for debug
+* /clag pdump : dump current player positions in overworld to clag-pdump.txt
+
+
 
 permissions
 === 
