@@ -197,7 +197,7 @@ public class CLagTileEntityTicker {
 			int cx = x >> 4;
 			int cz = z >> 4;
 
-			if ( bEnableSlowing && !bIsProfiling && isChunkSkippedNow(dim, cx, cz) && canSkipType(tileEntity.blockType.blockID) ) continue;
+			if ( bEnableSlowing && !bIsProfiling && isChunkSkippedNow(dim, cx, cz) && canSkipType(world.getBlockId(x, tileEntity.yCoord, z)) ) continue;
 
 			if ( !tileEntity.isInvalid() && tileEntity.hasWorldObj() && chunkProvider.chunkExists(cx, cz) ) {
 				try {
@@ -216,7 +216,7 @@ public class CLagTileEntityTicker {
 						last_exc_x = x;
 						last_exc_y = tileEntity.yCoord;
 						last_exc_z = z;
-						last_exc_type = tileEntity.blockType.blockID;
+						last_exc_type = world.getBlockId(x, tileEntity.yCoord, z);
 
 						// print coords and type
 						int t = last_exc_type;

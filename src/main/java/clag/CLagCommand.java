@@ -55,11 +55,10 @@ public class CLagCommand extends CommandBase {
 			CLagTileEntityTicker.instance.timesum_min_slowC = c;
 			CLagUtils.chatMessage(sender, "clag minslow=" + a + "," + b + "," + c);
 		} else if ( sub.equals("worst") ) {
-			if (!CLag.instance.bIsCLagRunning) { CLagUtils.chatMessage(sender, "clag is not running (no hook)"); return; }
-			if (!g.bTickOverride) { CLagUtils.chatMessage(sender, "clag is not running (no tick-override)"); return; }
+			// if (!CLag.instance.bIsCLagHookInstalled) { CLagUtils.chatMessage(sender, "clag is not running (no hook)"); return; }
+			// if (!g.bTickOverride) { CLagUtils.chatMessage(sender, "clag is not running (no tick-override)"); return; }
 			
 			String txt = "";
-			txt += "worst chunk: ";
 
 			CLagTileEntityTicker.ChunkInfo o = g.worst_chunk_info;
 			if (o == null)
@@ -67,9 +66,10 @@ public class CLagCommand extends CommandBase {
 				txt += "(no chunk profiled)";
 			} else 
 			{
+				txt += "worst chunk: ";
 				txt += " " + o.worst_x + "," + o.worst_y + "," + o.worst_z;
+				txt += " time=" + g.worst_chunk_time / 1000 + "mys";
 			}
-			txt += " time=" + g.worst_chunk_time / 1000 + "mys";
 			CLagUtils.chatMessage(sender, txt);
 		} else if ( sub.equals("reload") ) {
 			CLag.instance.loadConfig();
@@ -108,19 +108,27 @@ public class CLagCommand extends CommandBase {
 		{
 			g.bForceVanillaTick = parseIntWithMin(sender, par2ArrayOfStr[1], 0) != 0;
 			CLagUtils.chatMessage(sender, String.format("bForceVanillaTick=%d",g.bForceVanillaTick ? 1 : 0));
-					
+
+		} else if ( sub.equals("profile_only") ) // 1= warnings only, no slowing possible, the hook is installed only during a profile tick
+		{
+			g.bHookJustForProfileTick = parseIntWithMin(sender, par2ArrayOfStr[1], 0) != 0;
+			if (!g.bHookJustForProfileTick) CLag.instance.startCLag();
+			if (g.bHookJustForProfileTick) CLag.instance.stopCLag();
+			CLagUtils.chatMessage(sender, String.format("bHookJustForProfileTick=%d",g.bHookJustForProfileTick ? 1 : 0));
+			
 		} else if ( sub.equals("debug") ) // output infos
 		{
-			
-			CLagUtils.chatMessage(sender, String.format("bIsCLagRunning=%d",CLag.instance.bIsCLagRunning ? 1 : 0));
+			CLagUtils.chatMessage(sender, String.format("bIsCLagHookInstalled=%d",CLag.instance.bIsCLagHookInstalled ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bTickOverride=%d",g.bTickOverride ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bEnableSlowing=%d",g.bEnableSlowing ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bHookJustForProfileTick=%d",g.bHookJustForProfileTick ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bForceVanillaTick=%d",g.bForceVanillaTick ? 1 : 0));
 			
 			int t = g.last_exc_type;
-			String tn = Block.blocksList[t].getUnlocalizedName();
-			CLagUtils.chatMessage(sender, String.format("exceptions #%d last: dim=%d %d,%d,%d type=%d=%s",g.c_exc,g.last_exc_dim,g.last_exc_x,g.last_exc_y,g.last_exc_z,t,tn));
+			String tn = (t <= 0 || Block.blocksList[t] == null) ? "null" : Block.blocksList[t].getUnlocalizedName();
+			if (g.c_exc == 0) 
+					CLagUtils.chatMessage(sender, String.format("exceptions #%d ",g.c_exc));
+			else	CLagUtils.chatMessage(sender, String.format("exceptions #%d last: dim=%d %d,%d,%d type=%d=%s",g.c_exc,g.last_exc_dim,g.last_exc_x,g.last_exc_y,g.last_exc_z,t,tn));
 
 			long dt = System.nanoTime() - g.last_profile_tick_start;
 			CLagUtils.chatMessage(sender, String.format("last profile %d secs ago, dur=%d mys",dt/1000/1000/1000,g.last_profile_tick_duration/1000));
@@ -146,21 +154,23 @@ public class CLagCommand extends CommandBase {
 			Iterator iterator = world.playerEntities.iterator();
 			while ( iterator.hasNext() ) {
 				EntityPlayerMP o = (EntityPlayerMP) iterator.next();
-				lines.add(String.format("player,%d,%d,%d,%d,\"%s\"\n",dim,o.posX,o.posY,o.posZ,o.getEntityName()));
+				lines.add(String.format("player,%d,%d,%d,%d,\"%s\"\n",dim,(int)o.posX,(int)o.posY,(int)o.posZ,o.getEntityName()));
 			}
 
 			try {
 				String path = "clag-pdump.txt";
 				File file = new File(DimensionManager.getCurrentSaveRootDirectory(), path);
 				FileUtils.writeLines(file, lines);
+				CLagUtils.chatMessage(sender, "clag pdump: saved as "+file.getAbsolutePath());
 	        }
 	        catch (IOException e)
 	        {
 	            e.printStackTrace();
+				CLagUtils.chatMessage(sender, "clag pdump: error saving file");
 	        }
 		} else {
 			CLagUtils.chatMessage(sender, "clag unknown subcommand");
-			CLagUtils.chatMessage(sender, "start,stop,minslow [A] [B] [C],worst,reload,slow [NUMTICKS],warn,enable_tick [0/1],enable_slow [0/1],force_vanilla [0/1],debug,blacklist [id],reset");
+			CLagUtils.chatMessage(sender, "start,stop,minslow [A] [B] [C],worst,reload,slow [NUMTICKS],warn,enable_tick [0/1],enable_slow [0/1],force_vanilla [0/1],profile_only [0/1],debug,blacklist [id],reset,pdump");
 		}
 	}
 

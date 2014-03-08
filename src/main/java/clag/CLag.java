@@ -158,18 +158,18 @@ public class CLag {
 		return startProfiling(Arrays.<World>asList(arr));
 	}
 	*/
-	boolean bIsCLagRunning = false;
+	boolean bIsCLagHookInstalled = false;
 
 	public boolean startCLag() {
-		if ( bIsCLagRunning ) return false;
-		bIsCLagRunning = true;
+		if ( bIsCLagHookInstalled ) return false;
+		bIsCLagHookInstalled = true;
 		final Collection<World> worlds_ = Arrays.<World>asList(DimensionManager.getWorlds());
 		return startCLag(worlds_);
 	}
 
 	public boolean stopCLag() {
-		if ( !bIsCLagRunning ) return false;
-		bIsCLagRunning = false;
+		if ( !bIsCLagHookInstalled ) return false;
+		bIsCLagHookInstalled = false;
 		final Collection<World> worlds_ = Arrays.<World>asList(DimensionManager.getWorlds());
 		return stopCLag(worlds_);
 	}
