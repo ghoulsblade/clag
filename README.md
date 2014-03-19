@@ -5,7 +5,7 @@ serverside minecraft mod to slow down time in chunks causing lag
 
 download
 ====
-[CLag-0.0.3.jar](releases/CLag-0.0.3.jar?raw=true)
+[CLag-0.0.4.jar](releases/CLag-0.0.4.jar?raw=true)
 
 about
 ====
@@ -44,7 +44,7 @@ chat commands
 * /clag enable_tick : default = 1, 0 to disable custom tick code entirely
 * /clag enable_slow : default = 1, 0 to disable the tick-skipping entirely
 * /clag force_vanilla : default = 0, 1 to use vanilla tick code without any if-checks
-* /clag profile_only : 1 = warnings only, no slowing possible, the hook is installed only during a profile tick
+* /clag safe_mode : 1 = warnings only, no slowing possible, the hook is installed only during a profile tick
 * /clag debug : print some debug vars
 * /clag blacklist : clear blacklist
 * /clag blacklist [blockid] : add blockid to blacklist, blacklisted ids will never be slowed

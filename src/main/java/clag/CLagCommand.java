@@ -111,17 +111,17 @@ public class CLagCommand extends CommandBase {
 
 		} else if ( sub.equals("profile_only") ) // 1= warnings only, no slowing possible, the hook is installed only during a profile tick
 		{
-			g.bHookJustForProfileTick = parseIntWithMin(sender, par2ArrayOfStr[1], 0) != 0;
-			if (!g.bHookJustForProfileTick) CLag.instance.startCLag();
-			if (g.bHookJustForProfileTick) CLag.instance.stopCLag();
-			CLagUtils.chatMessage(sender, String.format("bHookJustForProfileTick=%d",g.bHookJustForProfileTick ? 1 : 0));
+			g.safemode = parseIntWithMin(sender, par2ArrayOfStr[1], 0) != 0;
+			if (!g.safemode) CLag.instance.startCLag();
+			if (g.safemode) CLag.instance.stopCLag();
+			CLagUtils.chatMessage(sender, String.format("safemode=%d",g.safemode ? 1 : 0));
 			
 		} else if ( sub.equals("debug") ) // output infos
 		{
 			CLagUtils.chatMessage(sender, String.format("bIsCLagHookInstalled=%d",CLag.instance.bIsCLagHookInstalled ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bTickOverride=%d",g.bTickOverride ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bEnableSlowing=%d",g.bEnableSlowing ? 1 : 0));
-			CLagUtils.chatMessage(sender, String.format("bHookJustForProfileTick=%d",g.bHookJustForProfileTick ? 1 : 0));
+			CLagUtils.chatMessage(sender, String.format("safemode=%d",g.safemode ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bForceVanillaTick=%d",g.bForceVanillaTick ? 1 : 0));
 			
 			int t = g.last_exc_type;

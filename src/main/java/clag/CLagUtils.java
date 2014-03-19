@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import clag.CLagTileEntityTicker.ChunkInfo;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
 public class CLagUtils {
@@ -129,8 +130,16 @@ public class CLagUtils {
 	}
 
 	public static int chatAllNearbyPlayers(int dim, int cx, int cz, double max_radius, String txt, int maxnum) {
+		List<EntityPlayerMP> list = listAllNearbyPlayers(dim, cx, cz, max_radius, maxnum);
+		for ( EntityPlayerMP p : list ) CLagUtils.sendChat(p, txt);
+		return list.size();
+	}
+	
+	public static List<EntityPlayerMP> listAllNearbyPlayers(int dim, int cx, int cz, double max_radius, int maxnum) {
+		List<EntityPlayerMP> res = new ArrayList<EntityPlayerMP>();
+	
 		World world = DimensionManager.getWorld(dim);
-		if ( world == null ) return 0;
+		if ( world == null ) return res;
 		Iterator iterator = world.playerEntities.iterator();
 		int c = 0;
 
@@ -143,11 +152,11 @@ public class CLagUtils {
 			double dx = p.posX - mx;
 			double dz = p.posZ - mz;
 			if ( dx * dx + dz * dz <= f_d ) {
-				CLagUtils.sendChat(p, txt);
-				if (++c >= maxnum) return c;
+				res.add(p);
+				if (++c >= maxnum) return res;
 			}
 		}
-		return c;
+		return res;
 	}
 	
 

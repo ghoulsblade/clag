@@ -3,6 +3,11 @@
 
 * binary : by doing "gradlew.bat build" in command prompt at the project root
 
+== 2014-03-18 sjphone : devanchan reported problem on TPPI
+
+noone else online in server, place coal in single furnace, reported as slowed
+http://puu.sh/7AaX5.png
+
 == 2014-03-08 clag test notes 
 
 * DONE: option to dump to file coords of online players ->  chat-command for test server to create chunkloaders at those positions

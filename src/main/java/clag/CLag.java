@@ -48,7 +48,7 @@ public class CLag {
 		CLagUtils.debug("CLag: serverStarting 03");
 
 		// autostart
-		if (autostart && !CLagTileEntityTicker.instance.bHookJustForProfileTick)
+		if (autostart && !CLagTileEntityTicker.instance.safemode)
 		{
 			CLagUtils.debug("CLag: autostarting profiling+slowing...");
 			startCLag();
@@ -85,7 +85,7 @@ public class CLag {
 		String cat = Configuration.CATEGORY_GENERAL;
 		debug = config.get(cat, "debug", debug).getBoolean(debug);
 		autostart = config.get(cat, "autostart", autostart).getBoolean(autostart);
-		g.bHookJustForProfileTick = config.get(cat, "bHookJustForProfileTick", g.bHookJustForProfileTick).getBoolean(g.bHookJustForProfileTick);
+		g.safemode = config.get(cat, "safemode", g.safemode).getBoolean(g.safemode);
 		
 		CLagTileEntityTicker.profile_interval = config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
 		CLagTileEntityTicker.warn_interval = config.get(cat, "warn_interval", CLagTileEntityTicker.warn_interval).getInt();

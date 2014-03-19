@@ -61,7 +61,7 @@ public class CLagTileEntityTicker {
 	public static boolean bForceVanillaTick = false;
 	
 
-	public static boolean bHookJustForProfileTick = true;
+	public static boolean safemode = true;
 
 
 	// ----------------------------- constructor
@@ -117,27 +117,37 @@ public class CLagTileEntityTicker {
 
 	public void warnEndTick() {
 		int c = 0;
-		for ( ChunkInfo o : warnset ) {
-			//c += warnNearestPlayer(o);
-			c += warnAllNearbyPlayers(o,max_warn_number_of_players - c);
+
+		// collect which player to warn about what chunks
+		Map<EntityPlayerMP, List<ChunkInfo> > map = new HashMap<EntityPlayerMP, List<ChunkInfo> >();
+		for ( ChunkInfo o : warnset )
+		{
+			List<EntityPlayerMP> list = CLagUtils.listAllNearbyPlayers(o.pos.dim, o.pos.cx, o.pos.cz, warn_radius, max_warn_number_of_players - c);
+			for ( EntityPlayerMP p : list ) 
+			{
+				List<ChunkInfo> L = map.get(p);
+				if (L == null)
+				{ 
+					L = new ArrayList<ChunkInfo>();
+					map.put(p, L);
+				}
+				L.add(o);
+			}
+			
+			// add number of players warned
+			c += list.size();
 			if ( c >= max_warn_number_of_players ) break; // sanity check
 		}
-	}
-
-	public int warnNearestPlayer(ChunkInfo o) {
-		EntityPlayerMP p = CLagUtils.findNearestPlayer(o.pos.dim, o.pos.cx, o.pos.cz, warn_radius);
-		if ( p == null ) return 0;
-		String txt = warn_text;
-		//txt += " " + (o.pos.cx * 16 + 8) + "," + (o.pos.cz * 16 + 8);
-		txt += " worst= " + o.worst_x + "," + o.worst_y + "," + o.worst_z;
-		CLagUtils.sendChat(p, txt);
-		return 1;
-	}
-
-	public int warnAllNearbyPlayers(ChunkInfo o,int maxnum) {
-		String txt = warn_text;
-		txt += " worst= " + o.worst_x + "," + o.worst_y + "," + o.worst_z;
-		return CLagUtils.chatAllNearbyPlayers(o.pos.dim, o.pos.cx, o.pos.cz, warn_radius, txt, maxnum);
+		
+		// now assemble individual warning message for each player
+		for (Map.Entry<EntityPlayerMP, List<ChunkInfo> > entry : map.entrySet())
+		{
+			String txt = warn_text;
+			ChunkInfo worst = null;
+			for ( ChunkInfo o : entry.getValue() ) if (worst == null || o.iTimeSum >= worst.iTimeSum) worst = o;
+			if (worst != null) txt += " worst= " + worst.worst_x + "," + worst.worst_y + "," + worst.worst_z;
+			CLagUtils.sendChat(entry.getKey(), txt);
+		}
 	}
 
 	// ----------------------------- tick
@@ -162,7 +172,7 @@ public class CLagTileEntityTicker {
 			}
 			
 			// enable hook
-			if (bHookJustForProfileTick) CLag.instance.startCLag();
+			if (safemode) CLag.instance.startCLag();
 		}
 
 		lastchunk_dim = Integer.MAX_VALUE; // make sure cur_ticknum check (sum reset) is done for last used chunk as well
@@ -179,8 +189,9 @@ public class CLagTileEntityTicker {
 			CLagUtils.debug("CLagTileEntityTicker:EndTick profile " + iTickNum + " tickdur="+dt+",worst_chunk_time=" + worst_chunk_time);
 
 			// disable hook
-			if (bHookJustForProfileTick) CLag.instance.stopCLag();
+			if (safemode) CLag.instance.stopCLag();
 		}
+		bIsProfiling = false;
 	}
 
 
