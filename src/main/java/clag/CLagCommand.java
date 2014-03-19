@@ -3,7 +3,10 @@ package clag;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
@@ -14,6 +17,9 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 import org.apache.commons.io.FileUtils;
+
+import clag.CLagTileEntityTicker.ChunkInfo;
+import clag.CLagTileEntityTicker.ChunkInfoPos;
 
 public class CLagCommand extends CommandBase {
 
@@ -83,6 +89,7 @@ public class CLagCommand extends CommandBase {
 			if ( o != null ) 
 			{
 				o.force_slow_until_tick = until_tick;
+				o.force_slow_author = sender.getCommandSenderName();
 				CLagUtils.chatMessage(sender, "chunk slowed: "+(o.pos.cx*16)+","+(o.pos.cz*16));
 			}
 			
@@ -133,7 +140,23 @@ public class CLagCommand extends CommandBase {
 			long dt = System.nanoTime() - g.last_profile_tick_start;
 			CLagUtils.chatMessage(sender, String.format("last profile %d secs ago, dur=%d mys",dt/1000/1000/1000,g.last_profile_tick_duration/1000));
 
-			
+			String txt = "force-slowed chunks:";
+			Map<ChunkInfoPos, ChunkInfo> map = g.mChunkInfo;
+			for (ChunkInfo o : map.values())
+			{
+				if (o.force_slow_until_tick != 0 && g.getSlowFactor(o) > 1)
+				{
+					txt += String.format("\n dim=%d %d,%d",o.pos.dim,o.pos.cx*16,o.pos.cz*16);
+					if (o.force_slow_until_tick < Integer.MAX_VALUE) {
+						int rest = o.force_slow_until_tick - g.cur_ticknum;
+						if (rest >= 0) txt += String.format(" for %d more seconds",rest/20);
+					}
+					if (o.force_slow_author != null) txt += String.format(" by %s",o.force_slow_author);
+					
+					// force_slow_until_tick
+				}
+			}
+			CLagUtils.chatMessage(sender,txt);
 			
 		} else if ( sub.equals("blacklist") )
 		{

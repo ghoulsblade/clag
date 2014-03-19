@@ -360,6 +360,7 @@ public class CLagTileEntityTicker {
 		public int worst_y;
 		public int worst_z;
 		public int force_slow_until_tick;
+		public String force_slow_author;
 		public ChunkInfoPos pos;
 
 		public ChunkInfo(ChunkInfoPos _pos) {

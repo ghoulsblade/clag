@@ -5,7 +5,7 @@ serverside minecraft mod to slow down time in chunks causing lag
 
 download
 ====
-[CLag-0.0.5.jar](releases/CLag-0.0.5.jar?raw=true)
+[CLag-0.0.6.jar](releases/CLag-0.0.6.jar?raw=true)
 
 about
 ====
@@ -24,7 +24,7 @@ current status
 ====
 
 * profiling and slowing for tile entities works
-* 3 thresholds and slow factors can be configured, by default x4, x10, x20
+* 3 thresholds and slow factors can be configured, by default x4, x16, x64
 * players near laggy chunks are given a chat message with coords of the worst tile-entity to help them fix it
 
 
@@ -32,6 +32,7 @@ chat commands
 ====
 
 * /clag-info : for players, shows information about the current chunk
+* /clag-near : for players, shows a list of nearby slowed chunks
 * /clag [subcommand] : admin only
 * /clag minslow [A] [B] [C] : set time-per-chunk thresholds, in nanoseconds, A=x4 B=x10 C=x20 by default
 * /clag worst : list coords and time of worst chunk
@@ -58,6 +59,7 @@ permissions
 
 in MCPC, all commands are assigned a permission node base off the classpath to the command class.  
 * clag.CLagCommandInfo = for players, so they can do /clag-info
+* clag.CLagCommandNear = for players, so they can do /clag-near
 * clag.CLagCommand = for admins, access /clag [subcommand]
 
 ideas
