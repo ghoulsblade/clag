@@ -385,9 +385,12 @@ public class CLagTileEntityTicker {
 	}
 
 	public ChunkInfo getChunkInfoAtPlayer(EntityPlayerMP p) {
+		return getChunkInfoAtPlayer(p,0,0);
+	}
+	public ChunkInfo getChunkInfoAtPlayer(EntityPlayerMP p,int ax,int az) {
 		int dim = p.dimension;
-		int cx = ((int) p.posX) >> 4;
-		int cz = ((int) p.posZ) >> 4;
+		int cx = ((int) p.posX + ax) >> 4;
+		int cz = ((int) p.posZ + az) >> 4;
 		return getChunkInfo(dim, cx, cz);
 	}
 

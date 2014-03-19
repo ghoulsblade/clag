@@ -45,6 +45,7 @@ public class CLag {
 		CLagUtils.debug("CLag: serverStarting 02");
 		event.registerServerCommand(new CLagCommand());
 		event.registerServerCommand(new CLagCommandInfo());
+		event.registerServerCommand(new CLagCommandNear());
 		CLagUtils.debug("CLag: serverStarting 03");
 
 		// autostart
