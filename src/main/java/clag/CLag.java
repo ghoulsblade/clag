@@ -35,8 +35,8 @@ public class CLag {
 	public static CommonProxy proxy;
 
 	public File configfile;
-	public static boolean debug = true;
-	public static boolean autostart = true;
+	public static boolean debug;
+	public static boolean autostart;
 	
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
@@ -84,8 +84,8 @@ public class CLag {
 		CLagTileEntityTicker g = CLagTileEntityTicker.instance;
 
 		String cat = Configuration.CATEGORY_GENERAL;
-		debug = config.get(cat, "debug", debug).getBoolean(debug);
-		autostart = config.get(cat, "autostart", autostart).getBoolean(autostart);
+		debug = config.get(cat, "debug", true).getBoolean(true);
+		autostart = config.get(cat, "autostart", true).getBoolean(true);
 		g.safemode = config.get(cat, "safemode", g.safemode).getBoolean(g.safemode);
 		
 		CLagTileEntityTicker.profile_interval = config.get(cat, "profile_interval", CLagTileEntityTicker.profile_interval).getInt();
