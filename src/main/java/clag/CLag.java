@@ -10,8 +10,9 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import net.minecraft.block.Block;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -103,9 +104,9 @@ public class CLag {
 		CLagTileEntityTicker.slow_down_factorB = config.get(cat, "slow_down_factorB", "" + CLagTileEntityTicker.slow_down_factorB).getInt();
 		CLagTileEntityTicker.slow_down_factorC = config.get(cat, "slow_down_factorC", "" + CLagTileEntityTicker.slow_down_factorC).getInt();
 
-		int[] arr = config.get(cat, "blacklist", new int[] {}).getIntList();
+		String[] arr = config.get(cat, "blacklist", new String[] {}).getStringList();
 		g.BlackListClear();
-		for (int i=0;i<arr.length;++i) g.BlackListAdd(arr[i]);
+		for (int i=0;i<arr.length;++i) g.BlackListAdd(Block.getBlockFromName(arr[i]));
 
 		CLagUtils.debug("CLag: profile_interval " + CLagTileEntityTicker.profile_interval);
 		CLagUtils.debug("CLag: warn_interval " + CLagTileEntityTicker.warn_interval);

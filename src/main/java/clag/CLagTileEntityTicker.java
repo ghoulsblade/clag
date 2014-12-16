@@ -12,10 +12,9 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraftforge.common.ForgeDummyContainer;
-import net.minecraftforge.liquids.IBlockLiquid.BlockType;
 
 import java.util.*;
+import net.minecraftforge.common.ForgeModContainer;
 
 // based on https://github.com/nallar/TickProfiler/blob/master/src/common/me/nallar/tickprofiler/minecraft/profiling/EntityTickProfiler.java
 public class CLagTileEntityTicker {
@@ -54,7 +53,7 @@ public class CLagTileEntityTicker {
 	public static int last_exc_x = 0;
 	public static int last_exc_y = 0;
 	public static int last_exc_z = 0;
-	public static int last_exc_type = 0;
+	public static Block last_exc_type;
 
 	public static boolean bEnableBlacklist = false;
 	public static boolean bEnableSlowing = true;
@@ -82,7 +81,7 @@ public class CLagTileEntityTicker {
 
 	// ----------------------------- blacklist
 	
-	public HashSet<Integer> blacklist = new HashSet<Integer>();
+	public HashSet<Block> blacklist = new HashSet<Block>();
 
 	public void BlackListClear ()
 	{
@@ -90,14 +89,14 @@ public class CLagTileEntityTicker {
 		CLagUtils.debug("CLagTileEntityTicker: BlackListClear ");
 	}
 	
-	public void BlackListAdd (int t)
+	public void BlackListAdd (Block t)
 	{
 		bEnableBlacklist = true;
 		blacklist.add(t);
-		CLagUtils.debug("CLagTileEntityTicker: BlackListAdd " + t);
+		CLagUtils.debug("CLagTileEntityTicker: BlackListAdd " + t.getUnlocalizedName());
 	}
 	
-	public boolean canSkipType (int t)
+	public boolean canSkipType (Block t)
 	{
 		if (!bEnableBlacklist) return true;
 		return !blacklist.contains(t);
@@ -215,7 +214,7 @@ public class CLagTileEntityTicker {
 			int cx = x >> 4;
 			int cz = z >> 4;
 
-			if ( bEnableSlowing && !bIsProfiling && isChunkSkippedNow(dim, cx, cz) && canSkipType(world.getBlockId(x, tileEntity.yCoord, z)) ) continue;
+			if ( bEnableSlowing && !bIsProfiling && isChunkSkippedNow(dim, cx, cz) && canSkipType(world.getBlock(x, tileEntity.yCoord, z)) ) continue;
 
 			if ( !tileEntity.isInvalid() && tileEntity.hasWorldObj() && chunkProvider.chunkExists(cx, cz) ) {
 				try {
@@ -223,8 +222,8 @@ public class CLagTileEntityTicker {
 				} catch ( Throwable var6 ) {
 					CrashReport crashReport = CrashReport.makeCrashReport(var6, "Ticking tile entity");
 					CrashReportCategory crashReportCategory = crashReport.makeCategory("Tile entity being ticked");
-					tileEntity.func_85027_a(crashReportCategory);
-					if ( ForgeDummyContainer.removeErroringTileEntities ) {
+					tileEntity.func_145828_a(crashReportCategory);
+					if (ForgeModContainer.removeErroringTileEntities ) {
 						FMLLog.severe(crashReport.getCompleteReport());
 						tileEntity.invalidate();
 						world.setBlockToAir(x, tileEntity.yCoord, z);
@@ -234,12 +233,11 @@ public class CLagTileEntityTicker {
 						last_exc_x = x;
 						last_exc_y = tileEntity.yCoord;
 						last_exc_z = z;
-						last_exc_type = world.getBlockId(x, tileEntity.yCoord, z);
+						last_exc_type = world.getBlock(x, tileEntity.yCoord, z);
 
 						// print coords and type
-						int t = last_exc_type;
 						String tn = tileEntity.blockType.getUnlocalizedName();
-						CLagUtils.debug(String.format("clag tile exception: dim=%d %d,%d,%d type=%d=%s",c_exc,last_exc_dim,last_exc_x,last_exc_y,last_exc_z,t,tn));
+						CLagUtils.debug(String.format("clag tile exception: dim=%d %d,%d,%d type=%s",c_exc,last_exc_dim,last_exc_x,last_exc_y,last_exc_z,tn));
 
 						throw new ReportedException(crashReport);
 					}
@@ -253,7 +251,8 @@ public class CLagTileEntityTicker {
 					Chunk chunk = world.getChunkFromChunkCoords(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4);
 
 					if ( chunk != null ) {
-						chunk.cleanChunkBlockTileEntity(tileEntity.xCoord & 15, tileEntity.yCoord, tileEntity.zCoord & 15);
+						// cleanChunkBlockTileEntity
+						chunk.removeInvalidTileEntity(tileEntity.xCoord & 15, tileEntity.yCoord, tileEntity.zCoord & 15);
 					}
 				}
 			}
@@ -287,8 +286,8 @@ public class CLagTileEntityTicker {
 				} catch ( Throwable var6 ) {
 					CrashReport crashReport = CrashReport.makeCrashReport(var6, "Ticking tile entity");
 					CrashReportCategory crashReportCategory = crashReport.makeCategory("Tile entity being ticked");
-					tileEntity.func_85027_a(crashReportCategory);
-					if ( ForgeDummyContainer.removeErroringTileEntities ) {
+					tileEntity.func_145828_a(crashReportCategory);
+					if ( ForgeModContainer.removeErroringTileEntities ) {
 						FMLLog.severe(crashReport.getCompleteReport());
 						tileEntity.invalidate();
 						world.setBlockToAir(x, tileEntity.yCoord, z);
@@ -298,12 +297,11 @@ public class CLagTileEntityTicker {
 						last_exc_x = x;
 						last_exc_y = tileEntity.yCoord;
 						last_exc_z = z;
-						last_exc_type = tileEntity.blockType.blockID;
+						last_exc_type = tileEntity.blockType;
 
 						// print coords and type
-						int t = last_exc_type;
 						String tn = tileEntity.blockType.getUnlocalizedName();
-						CLagUtils.debug(String.format("clag tile exception: dim=%d %d,%d,%d type=%d=%s",c_exc,last_exc_dim,last_exc_x,last_exc_y,last_exc_z,t,tn));
+						CLagUtils.debug(String.format("clag tile exception: dim=%d %d,%d,%d type=%s",c_exc,last_exc_dim,last_exc_x,last_exc_y,last_exc_z,tn));
 
 						throw new ReportedException(crashReport);
 					}
@@ -317,7 +315,8 @@ public class CLagTileEntityTicker {
 					Chunk chunk = world.getChunkFromChunkCoords(tileEntity.xCoord >> 4, tileEntity.zCoord >> 4);
 
 					if ( chunk != null ) {
-						chunk.cleanChunkBlockTileEntity(tileEntity.xCoord & 15, tileEntity.yCoord, tileEntity.zCoord & 15);
+						// cleanChunkBlockTileEntity
+						chunk.removeInvalidTileEntity(tileEntity.xCoord & 15, tileEntity.yCoord, tileEntity.zCoord & 15);
 					}
 				}
 			}
