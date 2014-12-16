@@ -131,8 +131,8 @@ public class CLagCommand extends CommandBase {
 			CLagUtils.chatMessage(sender, String.format("safemode=%d",g.safemode ? 1 : 0));
 			CLagUtils.chatMessage(sender, String.format("bForceVanillaTick=%d",g.bForceVanillaTick ? 1 : 0));
 			
-			int t = g.last_exc_type;
-			String tn = (t <= 0 || Block.blocksList[t] == null) ? "null" : Block.blocksList[t].getUnlocalizedName();
+			Block t = g.last_exc_type;
+			String tn = t == null ? "null" : t.getUnlocalizedName();
 			if (g.c_exc == 0) 
 					CLagUtils.chatMessage(sender, String.format("exceptions #%d ",g.c_exc));
 			else	CLagUtils.chatMessage(sender, String.format("exceptions #%d last: dim=%d %d,%d,%d type=%d=%s",g.c_exc,g.last_exc_dim,g.last_exc_x,g.last_exc_y,g.last_exc_z,t,tn));
@@ -162,7 +162,7 @@ public class CLagCommand extends CommandBase {
 		{
 			if (par2ArrayOfStr.length >= 2)
 			{
-				int t = parseIntWithMin(sender, par2ArrayOfStr[1], 0);
+				Block t = Block.getBlockFromName(par2ArrayOfStr[1]);
 				g.BlackListAdd(t);
 			} else
 			{
@@ -183,7 +183,7 @@ public class CLagCommand extends CommandBase {
 			Iterator iterator = world.playerEntities.iterator();
 			while ( iterator.hasNext() ) {
 				EntityPlayerMP o = (EntityPlayerMP) iterator.next();
-				lines.add(String.format("player,%d,%d,%d,%d,\"%s\"\n",dim,(int)o.posX,(int)o.posY,(int)o.posZ,o.getEntityName()));
+				lines.add(String.format("player,%d,%d,%d,%d,\"%s\"\n",dim,(int)o.posX,(int)o.posY,(int)o.posZ,o.getCommandSenderName()));
 			}
 
 			try {

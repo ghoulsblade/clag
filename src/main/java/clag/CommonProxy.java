@@ -1,6 +1,6 @@
 package clag;
 
-import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 
 public class CommonProxy {
@@ -15,7 +15,7 @@ public class CommonProxy {
 
 	public void registerTickHandler() {
 		CLagUtils.debug("CLag: CommonProxy.registerTickHandler 01");
-		TickRegistry.registerTickHandler(new CLagTickHandler(), Side.SERVER);
+		FMLCommonHandler.instance().bus().register(new CLagTickHandler());
 		CLagUtils.debug("CLag: CommonProxy.registerTickHandler 02");
 	}
 }

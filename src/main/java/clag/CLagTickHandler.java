@@ -1,33 +1,21 @@
 package clag;
 
-
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 
 import java.util.EnumSet;
 
-public class CLagTickHandler implements ITickHandler {
+public class CLagTickHandler {
 	int iTickNum = 0;
 
-	@Override
-	public void tickStart(EnumSet<TickType> type, Object... tickData) {
-		++iTickNum;
-		//FMLLog.info("CLag.tickStart " + iTickNum);
-		CLagTileEntityTicker.instance.StartTick(iTickNum);
-	}
-
-	@Override
-	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-		CLagTileEntityTicker.instance.EndTick(iTickNum);
-	}
-
-	@Override
-	public EnumSet<TickType> ticks() {
-		return (EnumSet.of(TickType.SERVER));
-	}
-
-	@Override
-	public String getLabel() {
-		return getClass().getSimpleName();
+	@SubscribeEvent
+	public void tickServer(TickEvent.ServerTickEvent event) {
+		if (event.phase == TickEvent.Phase.START) {
+			++iTickNum;
+			//FMLLog.info("CLag.tickStart " + iTickNum);
+			CLagTileEntityTicker.instance.StartTick(iTickNum);
+		} else {
+			CLagTileEntityTicker.instance.EndTick(iTickNum);
+		}
 	}
 }

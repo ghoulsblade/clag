@@ -4,7 +4,7 @@ import cpw.mods.fml.common.FMLLog;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -23,7 +23,7 @@ public class CLagUtils {
 	public static EntityPlayerMP getPlayerByCmdSender(ICommandSender par1ICommandSender) {
 		// from CommandHandler
 		String name = par1ICommandSender.getCommandSenderName();
-		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(name);
+		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().func_152612_a(name);
 		//FMLLog.info("getPlayerByCmdSender name="+name+" found="+((player != null)?"yes":"no"));
 		return player;
 	}
@@ -96,7 +96,7 @@ public class CLagUtils {
 			@Override
 			public void run() {
 				//use chat function here
-				_p.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(_txt).setColor(_fmt));
+				_p.addChatComponentMessage(new ChatComponentTranslation(_fmt + _txt));
 			}
 		}.start();
 	}
@@ -168,7 +168,7 @@ public class CLagUtils {
 
 	public static void chatMessage(ICommandSender sender, String txt) {
 		FMLLog.info("CLagCommand: chatMessage %s", txt);
-		sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions(txt).setColor(RED));
+		sender.addChatMessage(new ChatComponentTranslation(RED + txt));
 	}
 
 }
